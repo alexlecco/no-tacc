@@ -1,5 +1,5 @@
-import React, { Component } from "react";
-import { View, Text, StyleSheet } from "react-native";
+import React, { Component } from 'react';
+import { View, Text, StyleSheet, Image } from 'react-native';
 
 export default class ProductCard extends Component {
   constructor(props) {
@@ -7,10 +7,20 @@ export default class ProductCard extends Component {
   }
 
   render() {
+    // var l = {uri:this.props.url};
     return (
       <View style={styles.card}>
-        <Text style={styles.photo}>foto</Text>
-        <Text style={styles.name}>producto {this.props.number}</Text>
+        <Image style={styles.photo} source={require('../assets/img/img1.png')} />
+        <View style={styles.product}>
+          <Text style={styles.name}> Nombre Producto {this.props.number}</Text>
+          <Text style={styles.brand}>
+            Marca: {this.props.number} 
+          </Text>
+          <Text style={styles.description}>
+            Nostrud veniam elit quis ad tempor fugiat velit ipsum cupidatat
+            voluptate est mollit tempor dolore.
+          </Text>
+        </View>
       </View>
     );
   }
@@ -18,18 +28,24 @@ export default class ProductCard extends Component {
 
 const styles = StyleSheet.create({
   card: {
+    flex: 0.2,
     flexDirection: 'row',
-    justifyContent: 'center',
-    alignSelf: 'center',
-    paddingTop: 20,
-    paddingBottom: 20
+    paddingTop: 10,
+    paddingHorizontal: 10
   },
   photo: {
-    backgroundColor: 'powderblue',
-    padding: 10
+    width: 50,
+    height: 'auto',
+    flex: 0.3,
+    backgroundColor: 'powderblue'
+  },
+  product: {
+    flex: 0.7,
+    padding: 5,
+    backgroundColor: 'skyblue'
   },
   name: {
-    backgroundColor: 'skyblue',
-    padding: 10
+    fontSize: 20,
+    textAlign: 'center'
   }
 });

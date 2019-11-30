@@ -1,14 +1,15 @@
 import React, { Component } from 'react';
-import { StyleSheet, View } from 'react-native';
+import { StyleSheet, Text,  View } from 'react-native';
 import ProductCard from './components/ProductCard'
 
 export default class App extends Component {
   render() {
     return (
       <View style={styles.container}>
-        <ProductCard number={1} />
-        <ProductCard number={2} />
-        <ProductCard number={3} />
+      <Text style={{color: 'white'}}>3 productos encontrados</Text>
+        <ProductCard number={1} url={'./assets/img/img1.png'}/>
+        <ProductCard number={2} url={'./assets/img/img2.png'}/>
+        <ProductCard number={3} url={'./assets/img/img3.png'}/>
       </View>
     );
   }
@@ -17,7 +18,7 @@ export default class App extends Component {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: '#123',
     alignItems: 'center',
     justifyContent: 'center',
   },
