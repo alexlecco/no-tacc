@@ -42,12 +42,14 @@ export default class App extends Component {
   }
 
   render() {
+    const { products } = this.state;
+
     return (
       <SafeAreaView style={styles.container}>
         {Platform.OS === 'ios' && <StatusBar barStyle="default" />}
         {Platform.OS === 'android' && <View style={styles.statusBarUnderlay} />}
         
-        <Text style={styles.title}> 3 productos encontrados </Text>
+        <Text style={styles.title}> { products.length } productos encontrados </Text>
         <FlatList
           style={styles.flatList}
           data={this.state.products}

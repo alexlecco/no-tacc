@@ -6,13 +6,16 @@ export default class ProductCard extends Component {
     super(props);
   }
 
+  getProductPhoto(id) {
+    return `https://firebasestorage.googleapis.com/v0/b/prceliaco-1cfac.appspot.com/o/products%2F${id}.png?alt=media`
+  }
+
   render() {
     const product = this.props.product.item;
-    // console.log("this.props:::::", this.props.product.item);
     
     return (
       <View style={styles.card}>
-        <Image style={styles.photo} source={require('../assets/img/img1.png')} />
+        <Image style={styles.photo} source={{uri: this.getProductPhoto(product.id)}} />
         <View style={styles.product}>
           <Text style={styles.name}> {product.name}</Text>
           <Text style={styles.brand}>
