@@ -19,11 +19,10 @@ export default class ProductCard extends Component {
         <View style={styles.product}>
           <Text style={styles.name}> {product.name}</Text>
           <Text style={styles.brand}>
-            Marca: {product.name}
+            Marca: {product.brand}
           </Text>
           <Text style={styles.description}>
-            {product.name}:
-            Irure nisi duis reprehenderit consectetur.Anim consectetur ipsum qui esse non id pariatur ad quis.
+            Cantidad: {product.quantity}
           </Text>
         </View>
       </View>
