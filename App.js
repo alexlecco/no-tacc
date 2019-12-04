@@ -31,6 +31,8 @@ export default class App extends Component {
         products.push({
           id: child.val().id,
           name: child.val().name,
+          brand: child.val().brand,
+          quantity: child.val().quantity,
           _key: child.key
         });
       });
@@ -41,6 +43,7 @@ export default class App extends Component {
     });
   }
 
+
   render() {
     const { products } = this.state;
 
@@ -49,15 +52,24 @@ export default class App extends Component {
         {Platform.OS === 'ios' && <StatusBar barStyle="default" />}
         {Platform.OS === 'android' && <View style={styles.statusBarUnderlay} />}
         
-        <Text style={styles.title}> { products.length } productos encontrados </Text>
-        <FlatList
-          style={styles.flatList}
-          data={this.state.products}
-          renderItem={product => <ProductCard product={product} />}
-          keyExtractor={(product, index) => {
-            return product.id.toString();
-          }}
-        />
+        { 
+
+          products.length === 0 ?
+            <View><Text style={styles.title}>Cargando</Text></View>
+            : 
+            (
+              <React.Fragment>
+                <Text style={styles.title}> { products.length } productos encontrados </Text>
+                <FlatList
+                  style={styles.flatList}
+                  data={products}
+                  renderItem={product => <ProductCard product={product} />}
+                  keyExtractor={(product, index) => { return product.id.toString() }}
+                />
+              </React.Fragment>
+            )
+        }
+
       </SafeAreaView>
     );
   }
@@ -67,8 +79,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#123',
-    alignItems: 'stretch',
-    justifyContent: 'center'
   },
   title: {
     color: colors.white,
