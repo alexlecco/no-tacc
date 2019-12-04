@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
-import { StyleSheet, Text, View, FlatList, SafeAreaView } from 'react-native';
+import { StyleSheet, Text, View, FlatList, SafeAreaView, YellowBox, Platform, StatusBar } from 'react-native';
 import ProductCard from './components/ProductCard';
+import colors from './constants/Colors';
 
 import { firebaseApp } from './config/firebase';
 
@@ -11,10 +12,12 @@ export default class App extends Component {
       products: []
     };
 
-    this.productsRef = firebaseApp
-      .database()
-      .ref()
-      .child('products');
+    this.productsRef = firebaseApp.database().ref().child('products');
+
+    console.disableYellowBox = true;
+    console.warn('YellowBox is disabled.');
+    YellowBox.ignoreWarnings(['Warning: ...']);
+    console.ignoredYellowBox = ['Setting a timer'];
   }
 
   componentWillMount() {
@@ -39,9 +42,14 @@ export default class App extends Component {
   }
 
   render() {
+    const { products } = this.state;
+
     return (
       <SafeAreaView style={styles.container}>
-        <Text style={{ color: 'white' }}>3 productos encontrados</Text>
+        {Platform.OS === 'ios' && <StatusBar barStyle="default" />}
+        {Platform.OS === 'android' && <View style={styles.statusBarUnderlay} />}
+        
+        <Text style={styles.title}> { products.length } productos encontrados </Text>
         <FlatList
           style={styles.flatList}
           data={this.state.products}
@@ -62,7 +70,17 @@ const styles = StyleSheet.create({
     alignItems: 'stretch',
     justifyContent: 'center'
   },
+  title: {
+    color: colors.white,
+    textAlign: 'center',
+    paddingTop: 5,
+    paddingBottom: 5
+  },
   flatList:{
     flex: .5
-  }
+  },
+  statusBarUnderlay: {
+    height: 24,
+    backgroundColor: colors.black,
+  },
 });
