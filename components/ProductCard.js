@@ -7,17 +7,20 @@ export default class ProductCard extends Component {
   }
 
   render() {
-    //console.log("this.props:::::", this.props);
+    const product = this.props.product.item;
+    // console.log("this.props:::::", this.props.product.item);
     
     return (
       <View style={styles.card}>
+        <Image style={styles.photo} source={require('../assets/img/img1.png')} />
         <View style={styles.product}>
-          <Text style={styles.name}> {this.props.number}</Text>
+          <Text style={styles.name}> {product.name}</Text>
           <Text style={styles.brand}>
-            Marca: {this.props.number}
+            Marca: {product.name}
           </Text>
           <Text style={styles.description}>
-            {this.props.number}
+            {product.name}:
+            Irure nisi duis reprehenderit consectetur.Anim consectetur ipsum qui esse non id pariatur ad quis.
           </Text>
         </View>
       </View>
@@ -31,6 +34,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     paddingTop: 10,
     paddingHorizontal: 10
+    
   },
   photo: {
     width: 50,
