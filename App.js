@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { StyleSheet, Text, View, FlatList, SafeAreaView } from 'react-native';
+import { StyleSheet, Text, View, FlatList, SafeAreaView, YellowBox } from 'react-native';
 import ProductCard from './components/ProductCard';
 
 import { firebaseApp } from './config/firebase';
@@ -11,10 +11,12 @@ export default class App extends Component {
       products: []
     };
 
-    this.productsRef = firebaseApp
-      .database()
-      .ref()
-      .child('products');
+    this.productsRef = firebaseApp.database().ref().child('products');
+
+    console.disableYellowBox = true;
+    console.warn('YellowBox is disabled.');
+    YellowBox.ignoreWarnings(['Warning: ...']);
+    console.ignoredYellowBox = ['Setting a timer'];
   }
 
   componentWillMount() {
