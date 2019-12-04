@@ -7,18 +7,17 @@ export default class ProductCard extends Component {
   }
 
   render() {
-    // var l = {uri:this.props.url};
+    //console.log("this.props:::::", this.props);
+    
     return (
       <View style={styles.card}>
-        <Image style={styles.photo} source={require('../assets/img/img1.png')} />
         <View style={styles.product}>
-          <Text style={styles.name}> Nombre Producto {this.props.number}</Text>
+          <Text style={styles.name}> {this.props.number}</Text>
           <Text style={styles.brand}>
-            Marca: {this.props.number} 
+            Marca: {this.props.number}
           </Text>
           <Text style={styles.description}>
-            Nostrud veniam elit quis ad tempor fugiat velit ipsum cupidatat
-            voluptate est mollit tempor dolore.
+            {this.props.number}
           </Text>
         </View>
       </View>
