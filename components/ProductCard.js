@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { View, Text, StyleSheet, Image } from 'react-native';
+import { View, Text, StyleSheet, Image, TouchableWithoutFeedback} from 'react-native';
 
 export default class ProductCard extends Component {
   constructor(props) {
@@ -10,22 +10,28 @@ export default class ProductCard extends Component {
     return `https://firebasestorage.googleapis.com/v0/b/prceliaco-1cfac.appspot.com/o/products%2F${id}.png?alt=media`
   }
 
+  selectProduct(product) {
+    this.props.showOrHideProducByStores(product);
+  }
+
   render() {
     const product = this.props.product.item;
     
     return (
-      <View style={styles.card}>
-        <Image style={styles.photo} source={{uri: this.getProductPhoto(product.id)}} />
-        <View style={styles.product}>
-          <Text style={styles.name}> {product.name}</Text>
-          <Text style={styles.brand}>
-            Marca: {product.brand}
-          </Text>
-          <Text style={styles.description}>
-            Cantidad: {product.quantity}
-          </Text>
+      <TouchableWithoutFeedback onPress={() => this.selectProduct(product)}>
+        <View style={styles.card}>
+          <Image style={styles.photo} source={{uri: this.getProductPhoto(product.id)}} />
+          <View style={styles.product}>
+            <Text style={styles.name}> {product.name}</Text>
+            <Text style={styles.brand}>
+              Marca: {product.brand}
+            </Text>
+            <Text style={styles.description}>
+              Cantidad: {product.quantity}
+            </Text>
+          </View>
         </View>
-      </View>
+      </TouchableWithoutFeedback>
     );
   }
 }

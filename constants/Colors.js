@@ -18,4 +18,5 @@ export default colors = {
   text1: '#d2d3d5',
   white: '#fff',
   black: '#000',
+  background: '#123',
 };

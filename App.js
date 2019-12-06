@@ -1,7 +1,8 @@
 import React, { Component } from 'react';
-import { StyleSheet, Text, View, FlatList, SafeAreaView, YellowBox, Platform, StatusBar } from 'react-native';
-import ProductCard from './components/ProductCard';
+import { StyleSheet, View, SafeAreaView, YellowBox, Platform, StatusBar } from 'react-native';
 import colors from './constants/Colors';
+import ProductSearchResults from './components/ProductSearchResults';
+import ProductByStores from './components/ProductByStores';
 
 import { firebaseApp } from './config/firebase';
 
@@ -9,10 +10,13 @@ export default class App extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      products: []
+      products: [],
+      ProductByStoresVisible: false,
+      product: {},
     };
 
     this.productsRef = firebaseApp.database().ref().child('products');
+    showOrHideProducByStores = this.showOrHideProducByStores.bind(this);
 
     console.disableYellowBox = true;
     console.warn('YellowBox is disabled.');
@@ -22,6 +26,25 @@ export default class App extends Component {
 
   componentWillMount() {
     this.listenForProducts(this.productsRef);
+  }
+
+  showOrHideProducByStores(product) {
+    if(!this.state.ProductByStoresVisible) {
+      this.setState({
+        ProductByStoresVisible: !this.state.ProductByStoresVisible,
+        product: {
+          name: product.name,
+          id: product.id,
+      }});
+    }
+    else {
+      this.setState({
+        ProductByStoresVisible: !this.state.ProductByStoresVisible,
+        product: {
+          name: '',
+          id: product.id,
+      }});
+    }
   }
 
   listenForProducts(productsRef) {
@@ -43,31 +66,26 @@ export default class App extends Component {
     });
   }
 
-
   render() {
-    const { products } = this.state;
+    const { products, product } = this.state;
+    //console.log("STATE en app::::::::::::", this.state)
 
     return (
       <SafeAreaView style={styles.container}>
         {Platform.OS === 'ios' && <StatusBar barStyle="default" />}
         {Platform.OS === 'android' && <View style={styles.statusBarUnderlay} />}
-        
-        { 
 
-          products.length === 0 ?
-            <View><Text style={styles.title}>Cargando</Text></View>
-            : 
-            (
-              <React.Fragment>
-                <Text style={styles.title}> { products.length } productos encontrados </Text>
-                <FlatList
-                  style={styles.flatList}
-                  data={products}
-                  renderItem={product => <ProductCard product={product} />}
-                  keyExtractor={(product, index) => { return product.id.toString() }}
-                />
-              </React.Fragment>
-            )
+        {
+          this.state.ProductByStoresVisible ?
+            <ProductByStores
+              product={product}
+              showOrHideProducByStores={this.showOrHideProducByStores.bind(this)}
+            />
+          :
+            <ProductSearchResults 
+              products={products}
+              showOrHideProducByStores={this.showOrHideProducByStores.bind(this)}
+            />
         }
 
       </SafeAreaView>
@@ -78,16 +96,7 @@ export default class App extends Component {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#123',
-  },
-  title: {
-    color: colors.white,
-    textAlign: 'center',
-    paddingTop: 5,
-    paddingBottom: 5
-  },
-  flatList:{
-    flex: .5
+    backgroundColor: colors.background,
   },
   statusBarUnderlay: {
     height: 24,
