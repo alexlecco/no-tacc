@@ -1,7 +1,8 @@
 import React, { Component } from 'react';
 import { StyleSheet, View, SafeAreaView, YellowBox, Platform, StatusBar } from 'react-native';
-import ProductSearchResults from './components/ProductSearchResults';
 import colors from './constants/Colors';
+import ProductSearchResults from './components/ProductSearchResults';
+import ProductByStores from './components/ProductByStores';
 
 import { firebaseApp } from './config/firebase';
 
@@ -9,10 +10,15 @@ export default class App extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      products: []
+      products: [],
+      productByStores: [],
+      ProductByStoresVisible: false,
+      product: {},
     };
 
     this.productsRef = firebaseApp.database().ref().child('products');
+    this.productByStoresRef = firebaseApp.database().ref().child('products-stores');
+    showOrHideProducByStores = this.showOrHideProducByStores.bind(this);
 
     console.disableYellowBox = true;
     console.warn('YellowBox is disabled.');
@@ -22,6 +28,26 @@ export default class App extends Component {
 
   componentWillMount() {
     this.listenForProducts(this.productsRef);
+    this.listenForproductByStores(this.productByStoresRef);
+  }
+
+  showOrHideProducByStores(product) {
+    if(!this.state.ProductByStoresVisible) {
+      this.setState({
+        ProductByStoresVisible: !this.state.ProductByStoresVisible,
+        product: {
+          name: product.name,
+          id: product.id,
+      }});
+    }
+    else {
+      this.setState({
+        ProductByStoresVisible: !this.state.ProductByStoresVisible,
+        product: {
+          name: '',
+          id: product.id,
+      }});
+    }
   }
 
   listenForProducts(productsRef) {
@@ -43,16 +69,45 @@ export default class App extends Component {
     });
   }
 
+  listenForproductByStores(productByStoresRef) {
+    productByStoresRef.on('value', snap => {
+      let productByStores = [];
+      snap.forEach(child => {
+        productByStores.push({
+          id: child.val().id,
+          price: child.val().price,
+          product: child.val().product,
+          store: child.val().store,
+          _key: child.key
+        });
+      });
+
+      this.setState({
+        productByStores: productByStores
+      });
+    });
+  }
 
   render() {
-    const { products } = this.state;
+    const { products, product } = this.state;
 
     return (
       <SafeAreaView style={styles.container}>
         {Platform.OS === 'ios' && <StatusBar barStyle="default" />}
         {Platform.OS === 'android' && <View style={styles.statusBarUnderlay} />}
 
-        <ProductSearchResults products={products} />
+        {
+          this.state.ProductByStoresVisible ?
+            <ProductByStores
+              product={product}
+            />
+          :
+            <ProductSearchResults 
+              products={products}
+              showOrHideProducByStores={this.showOrHideProducByStores.bind(this)}
+            />
+        }
+
 
       </SafeAreaView>
     );
