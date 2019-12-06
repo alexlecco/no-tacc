@@ -11,13 +11,11 @@ export default class App extends Component {
     super(props);
     this.state = {
       products: [],
-      productByStores: [],
       ProductByStoresVisible: false,
       product: {},
     };
 
     this.productsRef = firebaseApp.database().ref().child('products');
-    this.productByStoresRef = firebaseApp.database().ref().child('products-stores');
     showOrHideProducByStores = this.showOrHideProducByStores.bind(this);
 
     console.disableYellowBox = true;
@@ -28,7 +26,6 @@ export default class App extends Component {
 
   componentWillMount() {
     this.listenForProducts(this.productsRef);
-    this.listenForproductByStores(this.productByStoresRef);
   }
 
   showOrHideProducByStores(product) {
@@ -69,27 +66,9 @@ export default class App extends Component {
     });
   }
 
-  listenForproductByStores(productByStoresRef) {
-    productByStoresRef.on('value', snap => {
-      let productByStores = [];
-      snap.forEach(child => {
-        productByStores.push({
-          id: child.val().id,
-          price: child.val().price,
-          product: child.val().product,
-          store: child.val().store,
-          _key: child.key
-        });
-      });
-
-      this.setState({
-        productByStores: productByStores
-      });
-    });
-  }
-
   render() {
     const { products, product } = this.state;
+    //console.log("STATE en app::::::::::::", this.state)
 
     return (
       <SafeAreaView style={styles.container}>
@@ -100,6 +79,7 @@ export default class App extends Component {
           this.state.ProductByStoresVisible ?
             <ProductByStores
               product={product}
+              showOrHideProducByStores={this.showOrHideProducByStores.bind(this)}
             />
           :
             <ProductSearchResults 
@@ -107,7 +87,6 @@ export default class App extends Component {
               showOrHideProducByStores={this.showOrHideProducByStores.bind(this)}
             />
         }
-
 
       </SafeAreaView>
     );
