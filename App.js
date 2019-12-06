@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
-import { StyleSheet, Text, View, FlatList, SafeAreaView, YellowBox, Platform, StatusBar } from 'react-native';
-import ProductCard from './components/ProductCard';
+import { StyleSheet, View, SafeAreaView, YellowBox, Platform, StatusBar } from 'react-native';
+import ProductSearchResults from './components/ProductSearchResults';
 import colors from './constants/Colors';
 
 import { firebaseApp } from './config/firebase';
@@ -51,24 +51,8 @@ export default class App extends Component {
       <SafeAreaView style={styles.container}>
         {Platform.OS === 'ios' && <StatusBar barStyle="default" />}
         {Platform.OS === 'android' && <View style={styles.statusBarUnderlay} />}
-        
-        { 
 
-          products.length === 0 ?
-            <View><Text style={styles.title}>Cargando</Text></View>
-            : 
-            (
-              <React.Fragment>
-                <Text style={styles.title}> { products.length } productos encontrados </Text>
-                <FlatList
-                  style={styles.flatList}
-                  data={products}
-                  renderItem={product => <ProductCard product={product} />}
-                  keyExtractor={(product, index) => { return product.id.toString() }}
-                />
-              </React.Fragment>
-            )
-        }
+        <ProductSearchResults products={products} />
 
       </SafeAreaView>
     );
@@ -78,16 +62,7 @@ export default class App extends Component {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#123',
-  },
-  title: {
-    color: colors.white,
-    textAlign: 'center',
-    paddingTop: 5,
-    paddingBottom: 5
-  },
-  flatList:{
-    flex: .5
+    backgroundColor: colors.background,
   },
   statusBarUnderlay: {
     height: 24,
