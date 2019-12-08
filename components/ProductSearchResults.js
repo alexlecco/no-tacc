@@ -2,6 +2,8 @@ import React, { Component } from 'react';
 import { StyleSheet, View, Text, FlatList } from 'react-native';
 import colors from '../constants/Colors';
 import ProductCard from './ProductCard';
+import { Spinner } from 'native-base';
+
 
 export default class ProductSearchResults extends Component {
     render() {
@@ -9,7 +11,7 @@ export default class ProductSearchResults extends Component {
         
         return(
             products.length === 0 ?
-                <View><Text style={styles.title}> Cargando </Text></View>
+                <View><Text style={styles.title}> Cargando </Text><Spinner></Spinner></View>
                 :
                 <React.Fragment>
                     <Text style={styles.title}> { products.length } productos encontrados </Text>
