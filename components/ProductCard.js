@@ -44,16 +44,10 @@ const styles = StyleSheet.create({
   card: {
     flex: 0.2,
     flexDirection: 'row',
-
     marginTop: 10,
     marginHorizontal: 10,
     borderRadius: 5,
-    backgroundColor: Colors.primaryDarkColor,
-    
-    paddingTop: 10,
-    paddingHorizontal: 10,
-    height: 120
-
+    backgroundColor: Colors.secondaryDarkColor,
   },
   photo: {
     borderRadius: 5,
@@ -68,7 +62,7 @@ const styles = StyleSheet.create({
     paddingLeft: 15,
   },
   name: {
-    fontSize: 15,
+    fontSize: 18,
     textTransform: 'capitalize',
     textAlign: 'center'
   }
