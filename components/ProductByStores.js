@@ -1,6 +1,7 @@
 import React, { Component } from "react";
-import { View, Text, StyleSheet, Button, Image, Dimensions } from "react-native";
+import { View, Text, StyleSheet, Button, Image, Dimensions, FlatList, } from "react-native";
 
+import StoreCard from './StoreCard';
 import { firebaseApp } from "../config/firebase";
 
 export default class ProductByStores extends Component {
@@ -52,17 +53,20 @@ export default class ProductByStores extends Component {
     const { productByStores } = this.state;
 
     return (
-      <View>
-        <Image
-          source={{ uri: this.getProductPhoto(product.id) }}
-          style={styles.coverImage}
-        />
-        <Text style={styles.title}> Producto: {product.name} </Text>
-        {productByStores.map((item, index) => (
-          <View key={index}>
-            <Text style={styles.title}>Precio: ${item.price}</Text>
-          </View>
-        ))}
+      <View style={styles.container}>
+        <View>
+          <Image
+            source={{ uri: this.getProductPhoto(product.id) }}
+            style={styles.coverImage}
+          />
+          <Text style={styles.title}> {product.name} </Text>
+          <FlatList
+              style={styles.flatList}
+              data={productByStores}
+              renderItem={(productByStores, product) => <StoreCard product={product} productByStores={productByStores} />}
+              keyExtractor={(product, index) => { return product.id.toString() }}
+          />
+        </View>
         <Button
           title="volver"
           onPress={() => this.props.showOrHideProducByStores(product)}
@@ -73,6 +77,11 @@ export default class ProductByStores extends Component {
 }
 
 const styles = StyleSheet.create({
+    container: {
+      flex: 1,
+      flexDirection: 'column',
+      justifyContent: 'space-between',
+    },
     title: {
         color: colors.white,
         textAlign: "center",
