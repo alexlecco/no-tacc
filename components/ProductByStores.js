@@ -8,13 +8,10 @@ export default class ProductByStores extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      productByStores: []
+      productByStores: [],
     };
 
-    this.productByStoresRef = firebaseApp
-      .database()
-      .ref()
-      .child("products-stores");
+    this.productByStoresRef = firebaseApp.database().ref().child("products-stores");
   }
 
   componentWillMount() {
@@ -27,7 +24,7 @@ export default class ProductByStores extends Component {
     productByStoresRef.on("value", snap => {
       let productByStores = [];
       snap.forEach(child => {
-        if (`prod${child.val().product}` === productID) {
+        if (child.val().product === productID) {
           productByStores.push({
             id: child.val().id,
             price: child.val().price,
@@ -50,28 +47,31 @@ export default class ProductByStores extends Component {
 
   render() {
     const { product } = this.props;
-    const { productByStores } = this.state;
+    const { productByStores, stores } = this.state;
 
     return (
-      <View style={styles.container}>
-        <View>
-          <Image
-            source={{ uri: this.getProductPhoto(product.id) }}
-            style={styles.coverImage}
-          />
-          <Text style={styles.title}> {product.name} </Text>
-          <FlatList
-              style={styles.flatList}
-              data={productByStores}
-              renderItem={(productByStores, product) => <StoreCard product={product} productByStores={productByStores} />}
-              keyExtractor={(product, index) => { return product.id.toString() }}
+      productByStores.length === 0 ?
+        <View style={styles.loading}><Text style={styles.title}> Cargando </Text></View>
+      :
+        <View style={styles.container}>
+          <View>
+            <Image
+              source={{ uri: this.getProductPhoto(product.id) }}
+              style={styles.coverImage}
+            />
+            <Text style={styles.title}> {product.name} </Text>
+            <FlatList
+                style={styles.flatList}
+                data={productByStores}
+                renderItem={productByStores => <StoreCard productByStores={productByStores} product={product} />}
+                keyExtractor={(product, index) => { return product.id.toString() }}
+            />
+          </View>
+          <Button
+            title="volver"
+            onPress={() => this.props.showOrHideProducByStores(product)}
           />
         </View>
-        <Button
-          title="volver"
-          onPress={() => this.props.showOrHideProducByStores(product)}
-        />
-      </View>
     );
   }
 }
@@ -87,6 +87,11 @@ const styles = StyleSheet.create({
         textAlign: "center",
         paddingTop: 20,
         paddingBottom: 5,
+    },
+    loading: {
+      flex: 1,
+      alignItems: 'center',
+      justifyContent: 'center',
     },
     photo: {
         width: 50,

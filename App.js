@@ -68,7 +68,6 @@ export default class App extends Component {
 
   render() {
     const { products, product } = this.state;
-    //console.log("STATE en app::::::::::::", this.state)
 
     return (
       <SafeAreaView style={styles.container}>
@@ -76,14 +75,14 @@ export default class App extends Component {
         {Platform.OS === 'android' && <View style={styles.statusBarUnderlay} />}
 
         {
-          this.state.ProductByStoresVisible ?
-            <ProductByStores
-              product={product}
+          !this.state.ProductByStoresVisible ?
+            <ProductSearchResults 
+              products={products}
               showOrHideProducByStores={this.showOrHideProducByStores.bind(this)}
             />
           :
-            <ProductSearchResults 
-              products={products}
+            <ProductByStores
+              product={product}
               showOrHideProducByStores={this.showOrHideProducByStores.bind(this)}
             />
         }
