@@ -9,6 +9,7 @@ export default class ProductByStores extends Component {
     super(props);
     this.state = {
       productByStores: [],
+      loading: true,
     };
 
     this.productByStoresRef = firebaseApp.database().ref().child("products-stores");
@@ -36,7 +37,8 @@ export default class ProductByStores extends Component {
       });
 
       this.setState({
-        productByStores: productByStores
+        productByStores: productByStores,
+        loading: false
       });
     });
   }
@@ -50,7 +52,7 @@ export default class ProductByStores extends Component {
     const { productByStores, stores } = this.state;
 
     return (
-      productByStores.length === 0 ?
+      this.state.loading ?
         <View style={styles.loading}><Text style={styles.title}> Cargando </Text></View>
       :
         <View style={styles.container}>
