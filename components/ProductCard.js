@@ -1,6 +1,10 @@
 import React, { Component } from 'react';
 import { View, Text, StyleSheet, Image, TouchableWithoutFeedback} from 'react-native';
 
+import {  Header, Content, Card, CardItem, Body } from "native-base";
+import Colors from '../constants/Colors';
+
+
 export default class ProductCard extends Component {
   constructor(props) {
     super(props);
@@ -40,23 +44,27 @@ const styles = StyleSheet.create({
   card: {
     flex: 0.2,
     flexDirection: 'row',
-    paddingTop: 10,
-    paddingHorizontal: 10
+    marginTop: 10,
+    marginHorizontal: 10,
+    borderRadius: 5,
+    backgroundColor: Colors.primaryDarkColor
     
   },
   photo: {
+    borderRadius: 5,
     width: 50,
     height: 'auto',
     flex: 0.3,
-    backgroundColor: 'powderblue'
+
   },
   product: {
     flex: 0.7,
-    padding: 5,
-    backgroundColor: 'skyblue'
+    paddingVertical: 10,
+    paddingLeft: 15,
   },
   name: {
-    fontSize: 20,
+    fontSize: 15,
+    textTransform: 'capitalize',
     textAlign: 'center'
   }
 });

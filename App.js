@@ -22,7 +22,7 @@ export default class App extends Component {
       products: [],
       ProductByStoresVisible: false,
       product: {},
-      searchText: 'biz',
+      searchText: '',
       allProducts: []
     };
     
