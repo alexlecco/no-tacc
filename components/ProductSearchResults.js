@@ -11,7 +11,8 @@ export default class ProductSearchResults extends Component {
         
         return(
             products.length === 0 ?
-                <View><Text style={styles.title}> Cargando </Text><Spinner></Spinner></View>
+                <View style={styles.loading}><Text style={styles.title}> Cargando </Text><Spinner></Spinner></View>
+
                 :
                 <React.Fragment>
                     <Text style={styles.title}> { products.length } productos encontrados </Text>
@@ -28,13 +29,18 @@ export default class ProductSearchResults extends Component {
 
 const styles = StyleSheet.create({
     title: {
-      color: colors.white,
-      textAlign: 'center',
-      paddingTop: 20,
-      paddingBottom: 5
+        color: colors.white,
+        textAlign: 'center',
+        paddingTop: 20,
+        paddingBottom: 5
+    },
+    loading: {
+        flex: 1,
+        alignItems: 'center',
+        justifyContent: 'center',
     },
     flatList:{
-      flex: .5
+        flex: .5
     }
 });
   

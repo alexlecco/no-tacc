@@ -44,11 +44,16 @@ const styles = StyleSheet.create({
   card: {
     flex: 0.2,
     flexDirection: 'row',
+
     marginTop: 10,
     marginHorizontal: 10,
     borderRadius: 5,
-    backgroundColor: Colors.primaryDarkColor
+    backgroundColor: Colors.primaryDarkColor,
     
+    paddingTop: 10,
+    paddingHorizontal: 10,
+    height: 120
+
   },
   photo: {
     borderRadius: 5,

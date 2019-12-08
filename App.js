@@ -25,7 +25,7 @@ export default class App extends Component {
       searchText: '',
       allProducts: []
     };
-    
+
     this.productsRef = firebaseApp
       .database()
       .ref()
