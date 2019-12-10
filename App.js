@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import {
   StyleSheet,
   View,
+  Text,
   SafeAreaView,
   YellowBox,
   Platform,
@@ -26,13 +27,12 @@ export default class App extends Component {
       product: {},
       searchText: '',
       allProducts: [],
-      textInputStatus: 'untouched'
+      textInputStatus: 'untouched',
+      activeApp: true
     };
 
-    this.productsRef = firebaseApp
-      .database()
-      .ref()
-      .child('products');
+    this.productsRef = firebaseApp.database().ref().child('products');
+    this.activeAppRef = firebaseApp.database().ref().child('activeApp');
     showOrHideProducByStores = this.showOrHideProducByStores.bind(this);
     clearText = this.clearText.bind(this);
 
@@ -44,6 +44,7 @@ export default class App extends Component {
 
   componentWillMount() {
     this.listenForProducts(this.productsRef);
+    this.listenForActiveApp(this.activeAppRef);
   }
 
   showOrHideProducByStores(product) {
@@ -83,6 +84,13 @@ export default class App extends Component {
         allProducts: products,
         products: products
       });
+    });
+  }
+
+  listenForActiveApp(activeAppRef) {
+    activeAppRef.on('value', snap => {
+      let activeApp = snap.val();
+      this.setState({ activeApp: activeApp });
     });
   }
 
@@ -134,26 +142,38 @@ export default class App extends Component {
       <SafeAreaView style={styles.container}>
         {Platform.OS === 'ios' && <StatusBar barStyle='default' />}
         {Platform.OS === 'android' && <View style={styles.statusBarUnderlay} />}
-        <View style={styles.searchSection}>
-          <TextInput
-            style={styles.textInput}
-            onChangeText={text => this.filterSearch(text)}
-            value={this.state.searchText}
-            placeholder='Buscar producto'
-          />
-          {this.renderClearButton()}
-        </View>
-        {this.state.ProductByStoresVisible ? (
-          <ProductByStores
-            product={product}
-            showOrHideProducByStores={this.showOrHideProducByStores.bind(this)}
-          />
-        ) : (
-          <ProductSearchResults
-            products={products}
-            showOrHideProducByStores={this.showOrHideProducByStores.bind(this)}
-          />
-        )}
+
+        {
+          this.state.activeApp
+          ?
+            <React.Fragment>
+              <View style={styles.searchSection}>
+                <TextInput
+                  style={styles.textInput}
+                  onChangeText={text => this.filterSearch(text)}
+                  value={this.state.searchText}
+                  placeholder='Buscar producto'
+                />
+                {this.renderClearButton()}
+              </View>
+
+              {this.state.ProductByStoresVisible ? (
+                <ProductByStores
+                  product={product}
+                  showOrHideProducByStores={this.showOrHideProducByStores.bind(this)}
+                />
+              ) : (
+                <ProductSearchResults
+                  products={products}
+                  showOrHideProducByStores={this.showOrHideProducByStores.bind(this)}
+                />
+              )}
+            </React.Fragment>
+          :
+            <View style={styles.activeApp}><Text style={styles.title}>Aplicación no activa</Text></View>
+        }
+              
+        
       </SafeAreaView>
     );
   }
@@ -185,9 +205,17 @@ const styles = StyleSheet.create({
     alignItems: 'center'
   },
   button: {
-    height: 10,
-    width: 10,
+    height: 15,
+    width: 15,
     marginRight: 20,
-    marginLeft: 10
-  }
+    marginLeft: 5
+  },
+  activeApp: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  title: {
+      color: colors.white,
+  },
 });
