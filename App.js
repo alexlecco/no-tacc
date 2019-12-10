@@ -6,7 +6,9 @@ import {
   YellowBox,
   Platform,
   StatusBar,
-  TextInput
+  TextInput,
+  TouchableOpacity,
+  Image
 } from 'react-native';
 
 import colors from './constants/Colors';
@@ -23,7 +25,8 @@ export default class App extends Component {
       ProductByStoresVisible: false,
       product: {},
       searchText: '',
-      allProducts: []
+      allProducts: [],
+      textInputStatus: 'untouched'
     };
 
     this.productsRef = firebaseApp
@@ -31,6 +34,7 @@ export default class App extends Component {
       .ref()
       .child('products');
     showOrHideProducByStores = this.showOrHideProducByStores.bind(this);
+    clearText = this.clearText.bind(this);
 
     console.disableYellowBox = true;
     console.warn('YellowBox is disabled.');
@@ -89,8 +93,37 @@ export default class App extends Component {
 
     this.setState({
       products: filteredProducts,
-      searchText: text
+      searchText: text,
+      textInputStatus: 'touched'
     });
+  }
+
+  clearText() {
+    this.setState({
+      textInputStatus: 'untouched',
+      searchText: ''
+    });
+
+    this.restartSearch()
+  }
+
+  restartSearch() {
+    this.listenForProducts(this.productsRef);
+  }
+
+  renderClearButton() {
+    if (this.state.textInputStatus == 'touched') {
+      return (
+        <TouchableOpacity onPress={() => this.clearText()}>
+          <Image
+            style={styles.button}
+            source={require('./assets/img/clear-input.png')}
+          />
+        </TouchableOpacity>
+      );
+    } else {
+      return <View/ >;
+    }
   }
 
   render() {
@@ -107,6 +140,7 @@ export default class App extends Component {
             value={this.state.searchText}
             placeholder='Buscar producto'
           />
+          {this.renderClearButton()}
         </View>
         {this.state.ProductByStoresVisible ? (
           <ProductByStores
@@ -148,5 +182,11 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center'
+  },
+  button: {
+    height: 10,
+    width: 10,
+    marginRight: 20,
+    marginLeft: 10
   }
 });
