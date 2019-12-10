@@ -1,5 +1,14 @@
 import React, { Component } from 'react';
-import { StyleSheet, View, SafeAreaView, YellowBox, Platform, StatusBar } from 'react-native';
+import {
+  StyleSheet,
+  View,
+  SafeAreaView,
+  YellowBox,
+  Platform,
+  StatusBar,
+  TextInput
+} from 'react-native';
+
 import colors from './constants/Colors';
 import ProductSearchResults from './components/ProductSearchResults';
 import ProductByStores from './components/ProductByStores';
@@ -13,9 +22,14 @@ export default class App extends Component {
       products: [],
       ProductByStoresVisible: false,
       product: {},
+      searchText: '',
+      allProducts: []
     };
 
-    this.productsRef = firebaseApp.database().ref().child('products');
+    this.productsRef = firebaseApp
+      .database()
+      .ref()
+      .child('products');
     showOrHideProducByStores = this.showOrHideProducByStores.bind(this);
 
     console.disableYellowBox = true;
@@ -29,21 +43,22 @@ export default class App extends Component {
   }
 
   showOrHideProducByStores(product) {
-    if(!this.state.ProductByStoresVisible) {
+    if (!this.state.ProductByStoresVisible) {
       this.setState({
         ProductByStoresVisible: !this.state.ProductByStoresVisible,
         product: {
           name: product.name,
-          id: product.id,
-      }});
-    }
-    else {
+          id: product.id
+        }
+      });
+    } else {
       this.setState({
         ProductByStoresVisible: !this.state.ProductByStoresVisible,
         product: {
           name: '',
-          id: product.id,
-      }});
+          id: product.id
+        }
+      });
     }
   }
 
@@ -61,8 +76,20 @@ export default class App extends Component {
       });
 
       this.setState({
+        allProducts: products,
         products: products
       });
+    });
+  }
+
+  filterSearch(text) {
+    let filteredProducts = this.state.allProducts.filter(product =>
+      product.name.toLowerCase().includes(text.toLowerCase())
+    );
+
+    this.setState({
+      products: filteredProducts,
+      searchText: text
     });
   }
 
@@ -71,22 +98,27 @@ export default class App extends Component {
 
     return (
       <SafeAreaView style={styles.container}>
-        {Platform.OS === 'ios' && <StatusBar barStyle="default" />}
+        {Platform.OS === 'ios' && <StatusBar barStyle='default' />}
         {Platform.OS === 'android' && <View style={styles.statusBarUnderlay} />}
-
-        {
-          !this.state.ProductByStoresVisible ?
-            <ProductSearchResults 
-              products={products}
-              showOrHideProducByStores={this.showOrHideProducByStores.bind(this)}
-            />
-          :
-            <ProductByStores
-              product={product}
-              showOrHideProducByStores={this.showOrHideProducByStores.bind(this)}
-            />
-        }
-
+        <View style={styles.searchSection}>
+          <TextInput
+            style={styles.textInput}
+            onChangeText={text => this.filterSearch(text)}
+            value={this.state.searchText}
+            placeholder='Buscar producto'
+          />
+        </View>
+        {this.state.ProductByStoresVisible ? (
+          <ProductByStores
+            product={product}
+            showOrHideProducByStores={this.showOrHideProducByStores.bind(this)}
+          />
+        ) : (
+          <ProductSearchResults
+            products={products}
+            showOrHideProducByStores={this.showOrHideProducByStores.bind(this)}
+          />
+        )}
       </SafeAreaView>
     );
   }
@@ -95,10 +127,26 @@ export default class App extends Component {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.background,
+    backgroundColor: colors.primaryColor
   },
   statusBarUnderlay: {
     height: 24,
-    backgroundColor: colors.black,
+    backgroundColor: colors.black
   },
+  textInput: {
+    flex: 1,
+    borderRadius: 8,
+    height: 40,
+    borderWidth: 2,
+    borderColor: colors.primaryColor,
+    margin: 10,
+    padding: 10,
+    color: colors.primaryTextColor,
+    backgroundColor: colors.white
+  },
+  searchSection: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center'
+  }
 });

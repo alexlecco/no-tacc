@@ -4,6 +4,8 @@ import { View, Text, StyleSheet, Button, Image, Dimensions, FlatList, } from "re
 import StoreCard from './StoreCard';
 import { firebaseApp } from "../config/firebase";
 
+import {Footer, Spinner} from 'native-base';
+
 export default class ProductByStores extends Component {
   constructor(props) {
     super(props);

@@ -19,4 +19,14 @@ export default colors = {
   white: '#fff',
   black: '#000',
   background: '#123',
+
+  // Theme v0.1
+  primaryColor: '#4db6ac',
+  primaryLightColor: '#82e9de',
+  primaryDarkColor: '#00867d',
+  secondaryColor: '#03a9f4',
+  secondaryLightColor: '#67daff',
+  secondaryDarkColor: '#007ac1',
+  primaryTextColor: '#000000',
+  secondaryTextColor: '#000000',
 };
