@@ -109,6 +109,7 @@ export default class App extends Component {
 
   restartSearch() {
     this.listenForProducts(this.productsRef);
+    this.setState({ProductByStoresVisible: false})
   }
 
   renderClearButton() {
