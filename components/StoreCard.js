@@ -3,6 +3,9 @@ import { View, Text, StyleSheet, Image } from 'react-native';
 
 import { firebaseApp } from "../config/firebase";
 
+import Colors from '../constants/Colors';
+
+
 export default class StoreCard extends Component {
   constructor(props) {
     super(props);
@@ -70,20 +73,20 @@ const styles = StyleSheet.create({
   card: {
     flex: 0.2,
     flexDirection: 'row',
-    paddingTop: 10,
-    paddingHorizontal: 10,
-    height: 120
+    marginTop: 10,
+    marginHorizontal: 10,
+    borderRadius: 5,
+    backgroundColor: Colors.primaryDarkColor,
   },
   photo: {
+    borderRadius: 5,
     width: 50,
     height: 'auto',
     flex: 0.3,
-    backgroundColor: 'powderblue'
   },
   store: {
     flex: 0.7,
     padding: 5,
-    backgroundColor: 'skyblue'
   },
   name: {
     fontSize: 20,
