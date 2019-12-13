@@ -71,6 +71,7 @@ export default class App extends Component {
           name: child.val().name,
           brand: child.val().brand,
           quantity: child.val().quantity,
+          marsh3Allowed: child.val().marsh3Allowed,
           _key: child.key
         });
       });
@@ -83,9 +84,15 @@ export default class App extends Component {
   }
 
   filterSearch(text) {
-    let filteredProducts = this.state.allProducts.filter(product =>
-      product.name.toLowerCase().includes(text.toLowerCase())
-    );
+    let hipoteticUser = { celiaquia3: true };
+
+    let filteredProducts = this.state.allProducts.filter(product => {
+      for(product in allProducts){
+        if(hipoteticUser.celiaquia3 === product.marsh3Allowed){
+          product.name.toLowerCase().includes(text.toLowerCase());
+        }
+      }
+    });
 
     this.setState({
       products: filteredProducts,
