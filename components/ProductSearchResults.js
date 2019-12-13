@@ -7,7 +7,7 @@ import { Spinner } from 'native-base';
 
 export default class ProductSearchResults extends Component {
     render() {
-        const { products, showOrHideProducByStores } = this.props;
+        const { products, showOrHideProducByStores, userName } = this.props;
         
         return(
             products.length === 0 ?
@@ -15,6 +15,7 @@ export default class ProductSearchResults extends Component {
 
                 :
                 <React.Fragment>
+                    <Text style={styles.title}> Bienvenido {userName} </Text>
                     <Text style={styles.title}> { products.length } productos encontrados </Text>
                     <FlatList
                         style={styles.flatList}

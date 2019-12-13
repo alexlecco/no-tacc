@@ -9,7 +9,8 @@ import {
   StatusBar,
   TextInput,
   TouchableOpacity,
-  Image
+  Image,
+  Button
 } from 'react-native';
 
 import colors from './constants/Colors';
@@ -17,6 +18,17 @@ import ProductSearchResults from './components/ProductSearchResults';
 import ProductByStores from './components/ProductByStores';
 
 import { firebaseApp } from './config/firebase';
+import * as Google from 'expo-google-app-auth';
+
+const LoginPage = props => {
+  return (
+    <View>
+      <Text style={styles.header}>Sign In With Google</Text>
+      <Button title="Sign in with Google" 
+       onPress={() => props.signIn()} />
+    </View>
+  )
+}
 
 export default class App extends Component {
   constructor(props) {
@@ -28,7 +40,10 @@ export default class App extends Component {
       searchText: '',
       allProducts: [],
       textInputStatus: 'untouched',
-      activeApp: true
+      activeApp: true,
+      signedIn: false,
+      name: "",
+      photoUrl: ""
     };
 
     this.productsRef = firebaseApp.database().ref().child('products');
@@ -135,6 +150,28 @@ export default class App extends Component {
     }
   }
 
+  signIn = async () => {
+    try {
+      const result = await Google.logInAsync({
+        androidClientId: "246004460762-6ac3ug1la8sill81a2j03vkl1oo1rhgu.apps.googleusercontent.com",
+        scopes: ["profile", "email"]
+      })
+
+      if (result.type === "success") {
+        this.setState({
+          signedIn: true,
+          name: result.user.name,
+          photoUrl: result.user.photoUrl
+        })
+      } else {
+        console.log("cancelled")
+      }
+
+    } catch (e) {
+      console.log("error", e)
+    }
+  }
+
   render() {
     const { products, product } = this.state;
 
@@ -146,29 +183,33 @@ export default class App extends Component {
         {
           this.state.activeApp
           ?
-            <React.Fragment>
-              <View style={styles.searchSection}>
-                <TextInput
-                  style={styles.textInput}
-                  onChangeText={text => this.filterSearch(text)}
-                  value={this.state.searchText}
-                  placeholder='Buscar producto'
-                />
-                {this.renderClearButton()}
-              </View>
+            this.state.signedIn ?
+              <React.Fragment>
+                <View style={styles.searchSection}>
+                  <TextInput
+                    style={styles.textInput}
+                    onChangeText={text => this.filterSearch(text)}
+                    value={this.state.searchText}
+                    placeholder='Buscar producto'
+                  />
+                  {this.renderClearButton()}
+                </View>
 
-              {this.state.ProductByStoresVisible ? (
-                <ProductByStores
-                  product={product}
-                  showOrHideProducByStores={this.showOrHideProducByStores.bind(this)}
-                />
-              ) : (
-                <ProductSearchResults
-                  products={products}
-                  showOrHideProducByStores={this.showOrHideProducByStores.bind(this)}
-                />
-              )}
-            </React.Fragment>
+                {this.state.ProductByStoresVisible ? (
+                  <ProductByStores
+                    product={product}
+                    showOrHideProducByStores={this.showOrHideProducByStores.bind(this)}
+                  />
+                ) : (
+                  <ProductSearchResults
+                    userName={this.state.name}
+                    products={products}
+                    showOrHideProducByStores={this.showOrHideProducByStores.bind(this)}
+                  />
+                )}
+              </React.Fragment>
+            :
+              <LoginPage signIn={this.signIn} />
           :
             <View style={styles.activeApp}><Text style={styles.title}>Aplicación no activa</Text></View>
         }
@@ -217,5 +258,8 @@ const styles = StyleSheet.create({
   },
   title: {
       color: colors.white,
+  },
+  header: {
+    fontSize: 25
   },
 });
