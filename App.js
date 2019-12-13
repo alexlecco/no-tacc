@@ -76,6 +76,16 @@ export default class App extends Component {
         });
       });
 
+      // HARDCODED USER..PLEASE DELETE
+      let hipoteticUser = { celiaquia3: true };
+
+      // POP PRODUCTS W CELIAC IMCOMPATIBLE WITH THE USER
+      for(product in products){
+        if(hipoteticUser.celiaquia3 != product.marsh3Allowed){
+          products.pop(product);
+        }
+      }
+
       this.setState({
         allProducts: products,
         products: products
@@ -84,15 +94,10 @@ export default class App extends Component {
   }
 
   filterSearch(text) {
-    let hipoteticUser = { celiaquia3: true };
-
-    let filteredProducts = this.state.allProducts.filter(product => {
-      for(product in allProducts){
-        if(hipoteticUser.celiaquia3 === product.marsh3Allowed){
-          product.name.toLowerCase().includes(text.toLowerCase());
-        }
-      }
-    });
+   
+    let filteredProducts = this.state.allProducts.filter(product => 
+      product.name.toLowerCase().includes(text.toLowerCase())
+    );
 
     this.setState({
       products: filteredProducts,
