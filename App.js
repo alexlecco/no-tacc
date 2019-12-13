@@ -2,11 +2,14 @@ import React, { Component } from 'react';
 import {
   StyleSheet,
   View,
+  Text,
   SafeAreaView,
   YellowBox,
   Platform,
   StatusBar,
-  TextInput
+  TextInput,
+  TouchableOpacity,
+  Image
 } from 'react-native';
 
 import colors from './constants/Colors';
@@ -23,14 +26,15 @@ export default class App extends Component {
       ProductByStoresVisible: false,
       product: {},
       searchText: '',
-      allProducts: []
+      allProducts: [],
+      textInputStatus: 'untouched',
+      activeApp: true
     };
 
-    this.productsRef = firebaseApp
-      .database()
-      .ref()
-      .child('products');
+    this.productsRef = firebaseApp.database().ref().child('products');
+    this.activeAppRef = firebaseApp.database().ref().child('activeApp');
     showOrHideProducByStores = this.showOrHideProducByStores.bind(this);
+    clearText = this.clearText.bind(this);
 
     console.disableYellowBox = true;
     console.warn('YellowBox is disabled.');
@@ -40,6 +44,7 @@ export default class App extends Component {
 
   componentWillMount() {
     this.listenForProducts(this.productsRef);
+    this.listenForActiveApp(this.activeAppRef);
   }
 
   showOrHideProducByStores(product) {
@@ -82,6 +87,13 @@ export default class App extends Component {
     });
   }
 
+  listenForActiveApp(activeAppRef) {
+    activeAppRef.on('value', snap => {
+      let activeApp = snap.val();
+      this.setState({ activeApp: activeApp });
+    });
+  }
+
   filterSearch(text) {
     let filteredProducts = this.state.allProducts.filter(product =>
       product.name.toLowerCase().includes(text.toLowerCase())
@@ -89,8 +101,38 @@ export default class App extends Component {
 
     this.setState({
       products: filteredProducts,
-      searchText: text
+      searchText: text,
+      textInputStatus: 'touched'
     });
+  }
+
+  clearText() {
+    this.setState({
+      textInputStatus: 'untouched',
+      searchText: ''
+    });
+
+    this.restartSearch()
+  }
+
+  restartSearch() {
+    this.listenForProducts(this.productsRef);
+    this.setState({ProductByStoresVisible: false})
+  }
+
+  renderClearButton() {
+    if (this.state.textInputStatus == 'touched') {
+      return (
+        <TouchableOpacity onPress={() => this.clearText()}>
+          <Image
+            style={styles.button}
+            source={require('./assets/img/clear-input.png')}
+          />
+        </TouchableOpacity>
+      );
+    } else {
+      return <View/ >;
+    }
   }
 
   render() {
@@ -100,25 +142,38 @@ export default class App extends Component {
       <SafeAreaView style={styles.container}>
         {Platform.OS === 'ios' && <StatusBar barStyle='default' />}
         {Platform.OS === 'android' && <View style={styles.statusBarUnderlay} />}
-        <View style={styles.searchSection}>
-          <TextInput
-            style={styles.textInput}
-            onChangeText={text => this.filterSearch(text)}
-            value={this.state.searchText}
-            placeholder='Buscar producto'
-          />
-        </View>
-        {this.state.ProductByStoresVisible ? (
-          <ProductByStores
-            product={product}
-            showOrHideProducByStores={this.showOrHideProducByStores.bind(this)}
-          />
-        ) : (
-          <ProductSearchResults
-            products={products}
-            showOrHideProducByStores={this.showOrHideProducByStores.bind(this)}
-          />
-        )}
+
+        {
+          this.state.activeApp
+          ?
+            <React.Fragment>
+              <View style={styles.searchSection}>
+                <TextInput
+                  style={styles.textInput}
+                  onChangeText={text => this.filterSearch(text)}
+                  value={this.state.searchText}
+                  placeholder='Buscar producto'
+                />
+                {this.renderClearButton()}
+              </View>
+
+              {this.state.ProductByStoresVisible ? (
+                <ProductByStores
+                  product={product}
+                  showOrHideProducByStores={this.showOrHideProducByStores.bind(this)}
+                />
+              ) : (
+                <ProductSearchResults
+                  products={products}
+                  showOrHideProducByStores={this.showOrHideProducByStores.bind(this)}
+                />
+              )}
+            </React.Fragment>
+          :
+            <View style={styles.activeApp}><Text style={styles.title}>Aplicación no activa</Text></View>
+        }
+              
+        
       </SafeAreaView>
     );
   }
@@ -148,5 +203,19 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center'
-  }
+  },
+  button: {
+    height: 15,
+    width: 15,
+    marginRight: 20,
+    marginLeft: 5
+  },
+  activeApp: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  title: {
+      color: colors.white,
+  },
 });
