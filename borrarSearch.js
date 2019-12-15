@@ -8,7 +8,7 @@ import { Spinner } from 'native-base';
 export default class ProductSearchResults extends Component {
     render() {
         const { products, showOrHideProductByStores, userName } = this.props;
-        const showLogOutButton = false;
+        const showLogOutButton = true;
         const showSettingsButton = true;
         
         return(

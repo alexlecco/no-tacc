@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "34893812883",
+    "firebase_url": "https://prceliaco-1cfac.firebaseio.com",
+    "project_id": "prceliaco-1cfac",
+    "storage_bucket": "prceliaco-1cfac.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:34893812883:android:121b44dcd229424ba32966",
+        "android_client_info": {
+          "package_name": "com.alexlecco.expo.notacc"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "34893812883-g06kjup3d4t0638cohik251qdh8oip09.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAMc4kbavMZEUFAf5mEqZFpXAxYtaw4HJc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "34893812883-g06kjup3d4t0638cohik251qdh8oip09.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

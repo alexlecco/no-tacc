@@ -20,19 +20,52 @@ import ProductSearchResults from './components/ProductSearchResults';
 import ProductByStores from './components/ProductByStores';
 
 import { firebaseApp } from './config/firebase';
-import * as Google from 'expo-google-app-auth';
+import { GoogleSignIn } from 'expo-google-sign-in';
+
+initAsync = async () => {
+  await GoogleSignIn.initAsync({
+    androidClientId: "246004460762-6ac3ug1la8sill81a2j03vkl1oo1rhgu.apps.googleusercontent.com"
+  });
+  this._syncUserWithStateAsync();
+};
+
+_syncUserWithStateAsync = async () => {
+  const user = await GoogleSignIn.signInSilentlyAsync();
+  this.setState({ user });
+};
+
+signOutAsync = async () => {
+  await GoogleSignIn.signOutAsync();
+  this.setState({ user: null });
+};
+
+signInAsync = async () => {
+  try {
+    await GoogleSignIn.askForPlayServicesAsync();
+    const { type, user } = await GoogleSignIn.signInAsync();
+    if (type === 'success') {
+      this._syncUserWithStateAsync();
+    }
+  } catch ({ message }) {
+    alert('login: Error:' + message);
+  }
+};
+
+onPress = () => {
+  if (this.state.user) {
+    this.signOutAsync();
+  } else {
+    this.signInAsync();
+  }
+};
 
 const LoginPage = props => {
   return (
     <View style={styles.loading}>
-      {
-        !props.getUser()
-        ?
-          <View />
-        :
-          <Button title="ingresá con Google"
-          onPress={() => props.googleSignIn()} />
-      }
+      <Button 
+        title="ingresá con Google wachi"
+        onPress={onPress()}
+      />
     </View>
   )
 }
@@ -43,8 +76,9 @@ const SettingsPage = props => {
     <View style={props.styles.settings}>
       <Text>grado de celiaqui Marsh 3</Text>
       <CheckBox
-        value={props.marsh3Allowed ? true : false}
-        onChange={() => props.changeMarsh3Value()}
+        title='grado de celiaqui Marsh 3'
+        checked={props.marsh3Allowed}
+        onPress={() => props.changeMarsh3Value()}
       />
       <Button title="Guardar" style={{marginTop: 20, backgroundColor: 'blue'}} onPress={() => props.showOrHideSettings()} />
     </View>
@@ -67,6 +101,7 @@ export default class App extends Component {
       name: '',
       photoUrl: '',
       marsh3Allowed: true,
+      user: null
     };
 
     this.productsRef = firebaseApp.database().ref().child('products');
@@ -91,25 +126,28 @@ export default class App extends Component {
     this.listenForProducts(this.productsRef);
     this.listenForActiveApp(this.activeAppRef);
     this.getUser();
+    initAsync();
   }
 
   async storeUser(user) {
     try {
        await AsyncStorage.setItem("user", JSON.stringify(user));
-       
+       await AsyncStorage.setItem("logged", true);
     } catch (error) {
+      await AsyncStorage.setItem("logged", false);
       //console.log("Something went wrong", error);
     }
   }
 
   async getUser() {
     try {
-      let userData = await AsyncStorage.getItem("user");
-      let data = JSON.parse(userData);
-      if(data !== null) {
-        this.setState({signedIn: true, name: data.name})
+      let user = JSON.parse(await AsyncStorage.getItem("user"));
+      let logged = await AsyncStorage.getItem("logged");
+      if(logged === true) {
+        this.setState({signedIn: true, name: user})
         return true;
       } else {
+        this.setState({signedIn: false, name: ""})
         return false;
       }
     } catch (error) {
@@ -117,8 +155,17 @@ export default class App extends Component {
     }
   }
 
+  addUser(loggedUser) {
+    var ref =  firebaseApp.database().ref();
+    var usersRef = ref.child('users');
+    usersRef.child(loggedUser.uid).set({
+      name: loggedUser.displayName,
+      userId: loggedUser.uid,
+    }).key;
+  }
+
   showOrHideProductByStores(product) {
-    if (!this.state.ProductByStoresVisible) {
+    if(!this.state.ProductByStoresVisible) {
       this.setState({
         ProductByStoresVisible: !this.state.ProductByStoresVisible,
         product: {
@@ -156,11 +203,11 @@ export default class App extends Component {
       });
 
       // HARDCODED USER..PLEASE DELETE
-      let hipoteticUser = { celiaquia3: true };
+      let hipoteticUser = { celiaquia3: false };
 
       // POP PRODUCTS W CELIAC IMCOMPATIBLE WITH THE USER
       for(product in products){
-        if(hipoteticUser.celiaquia3 != product.marsh3Allowed){
+        if(hipoteticUser.celiaquia3 !== product.marsh3Allowed){
           products.pop(product);
         }
       }
@@ -174,7 +221,7 @@ export default class App extends Component {
 
   changeMarsh3Value() {
     this.setState({ marsh3Allowed: !this.state.marsh3Allowed })
-    console.log("permitido??????", !this.state.marsh3Allowed)
+    //console.log("permitido??????", !this.state.marsh3Allowed)
   }
 
   listenForActiveApp(activeAppRef) {
@@ -226,43 +273,49 @@ export default class App extends Component {
     }
   }
 
-  
-
-
-
-
-
-  async googleSignIn() {
+  googleSignIn = async () => {
     try {
-      const result = await Google.logInAsync({
+      const config = {
         androidClientId: "246004460762-6ac3ug1la8sill81a2j03vkl1oo1rhgu.apps.googleusercontent.com",
         scopes: ["profile", "email"]
-      })
+      }
 
-      if (result.type === "success") {
+      const result = await Google.logInAsync(config)
+
+      if(result.type === 'success') {
         this.setState({
           signedIn: true,
           name: result.user.name,
           photoUrl: result.user.photoUrl
         })
         this.storeUser({name: result.user.name})
+
+        const credential = firebaseApp.auth.GoogleAuthProvider.credential(
+          result.idToken,
+          result.accessToken
+        );
+        
+        /* credential is and xf {} object */
+        firebaseApp.auth().signInWithCredential(credential)
+          .then(user => {//console.log( user);})
+          .catch(error => {//console.log(error);});
+        return result.accessToken;
       } else {
         //console.log("cancelled")
       }
-
     } catch (e) {
       //console.log("error", e)
     }
   }
 
   async googleSignOut() {
-    AsyncStorage.clear();
+    await AsyncStorage.setItem("user", {"user": {}, "logged": false});
     this.setState({signedIn: false, name: ''})
   }
 
   render() {
     const { products, product, signedIn, SettingsVisible } = this.state;
-    //console.log("state::::::", this.state)
+    const logged = signedIn;
 
     return (
       <SafeAreaView style={styles.container}>
@@ -272,7 +325,7 @@ export default class App extends Component {
         {
           this.state.activeApp
           ?
-            signedIn
+            logged
             ?
               SettingsVisible
               ?
@@ -309,13 +362,13 @@ export default class App extends Component {
                     />
                   )}
                 </React.Fragment>
+              
             :
-              <LoginPage getUser={this.getUser.bind(this)} googleSignIn={this.googleSignIn.bind(this)} />
+              <LoginPage getUser={this.getUser.bind(this)} />
           :
             <View style={styles.activeApp}><Text style={styles.title}>Aplicación no activa</Text></View>
         }
-              
-        
+
       </SafeAreaView>
     );
   }
