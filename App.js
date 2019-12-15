@@ -41,7 +41,7 @@ const SettingsPage = props => {
   //console.log("PROPS:::::::::::", props)
   return (
     <View style={props.styles.settings}>
-      <Text>grado de celiaqui Marsh 3</Text>
+      <Text>¿Tenés grado de celiaqui Marsh 3?</Text>
       <CheckBox
         value={props.marsh3Allowed ? true : false}
         onChange={() => props.changeMarsh3Value()}
@@ -56,17 +56,17 @@ export default class App extends Component {
     super(props);
     this.state = {
       products: [],
+      notAllowedProducts: [],
       ProductByStoresVisible: false,
-      SettingsVisible: true,
+      SettingsVisible: false,
       product: {},
       searchText: '',
-      allProducts: [],
       textInputStatus: 'untouched',
       activeApp: true,
       signedIn: false,
       name: '',
       photoUrl: '',
-      marsh3Allowed: true,
+      marsh3Allowed: false,
     };
 
     this.productsRef = firebaseApp.database().ref().child('products');
@@ -155,18 +155,10 @@ export default class App extends Component {
         });
       });
 
-      // HARDCODED USER..PLEASE DELETE
-      let hipoteticUser = { celiaquia3: true };
-
-      // POP PRODUCTS W CELIAC IMCOMPATIBLE WITH THE USER
-      for(product in products){
-        if(hipoteticUser.celiaquia3 != product.marsh3Allowed){
-          products.pop(product);
-        }
-      }
-
+      const notAllowedProducts = products.filter(product => product.marsh3Allowed)
+      
       this.setState({
-        allProducts: products,
+        notAllowedProducts: notAllowedProducts,
         products: products
       });
     });
@@ -174,7 +166,6 @@ export default class App extends Component {
 
   changeMarsh3Value() {
     this.setState({ marsh3Allowed: !this.state.marsh3Allowed })
-    console.log("permitido??????", !this.state.marsh3Allowed)
   }
 
   listenForActiveApp(activeAppRef) {
@@ -186,7 +177,7 @@ export default class App extends Component {
 
   filterSearch(text) {
    
-    let filteredProducts = this.state.allProducts.filter(product => 
+    let filteredProducts = this.state.products.filter(product => 
       product.name.toLowerCase().includes(text.toLowerCase())
     );
 
@@ -226,12 +217,6 @@ export default class App extends Component {
     }
   }
 
-  
-
-
-
-
-
   async googleSignIn() {
     try {
       const result = await Google.logInAsync({
@@ -261,7 +246,7 @@ export default class App extends Component {
   }
 
   render() {
-    const { products, product, signedIn, SettingsVisible } = this.state;
+    const { products, notAllowedProducts, product, signedIn, SettingsVisible } = this.state;
     //console.log("state::::::", this.state)
 
     return (
@@ -302,7 +287,7 @@ export default class App extends Component {
                   ) : (
                     <ProductSearchResults
                       userName={this.state.name}
-                      products={products}
+                      products={this.state.marsh3Allowed ? notAllowedProducts : products}
                       showOrHideProductByStores={this.showOrHideProductByStores.bind(this)}
                       googleSignOut={this.googleSignOut.bind(this)}
                       showOrHideSettings={this.showOrHideSettings.bind(this)}
