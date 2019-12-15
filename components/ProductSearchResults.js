@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { StyleSheet, View, Text, FlatList } from 'react-native';
+import { StyleSheet, View, Text, FlatList, Button } from 'react-native';
 import colors from '../constants/Colors';
 import ProductCard from './ProductCard';
 import { Spinner } from 'native-base';
@@ -16,6 +16,7 @@ export default class ProductSearchResults extends Component {
                 :
                 <React.Fragment>
                     <Text style={styles.title}> Bienvenido {userName} </Text>
+                    {false && <Button title="salir" onPress={() => this.props.googleLogOut()} />}
                     <Text style={styles.title}> { products.length } productos encontrados </Text>
                     <FlatList
                         style={styles.flatList}

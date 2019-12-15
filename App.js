@@ -10,7 +10,8 @@ import {
   TextInput,
   TouchableOpacity,
   Image,
-  Button
+  Button,
+  AsyncStorage
 } from 'react-native';
 
 import colors from './constants/Colors';
@@ -22,10 +23,9 @@ import * as Google from 'expo-google-app-auth';
 
 const LoginPage = props => {
   return (
-    <View>
-      <Text style={styles.header}>Sign In With Google</Text>
-      <Button title="Sign in with Google" 
-       onPress={() => props.signIn()} />
+    <View style={styles.loading}>
+      <Button title="ingresá con Google" 
+       onPress={() => props.googleSignIn()} />
     </View>
   )
 }
@@ -48,8 +48,12 @@ export default class App extends Component {
 
     this.productsRef = firebaseApp.database().ref().child('products');
     this.activeAppRef = firebaseApp.database().ref().child('activeApp');
+    this.usersRef = firebaseApp.database().ref().child('users');
+    
     showOrHideProducByStores = this.showOrHideProducByStores.bind(this);
+    googleLog = this.googleLog.bind(this);
     clearText = this.clearText.bind(this);
+    googleSignIn = this.googleSignIn.bind(this);
 
     console.disableYellowBox = true;
     console.warn('YellowBox is disabled.');
@@ -60,6 +64,36 @@ export default class App extends Component {
   componentWillMount() {
     this.listenForProducts(this.productsRef);
     this.listenForActiveApp(this.activeAppRef);
+    this.getUser();
+  }
+
+  async storeUser(user) {
+    try {
+       await AsyncStorage.setItem("user", JSON.stringify(user));
+       
+    } catch (error) {
+      console.log("Something went wrong", error);
+    }
+  }
+
+  async getUser() {
+    try {
+      let userData = await AsyncStorage.getItem("user");
+      let data = JSON.parse(userData);
+      if(data !== null) {
+        this.setState({signedIn: true, name: data.name})
+        return true;
+      } else {
+        return false;
+      }
+    } catch (error) {
+      console.log("Something went wrong", error);
+    }
+  }
+
+  googleLog() {
+    AsyncStorage.clear();
+    this.setState({signedIn: false, name: ''})
   }
 
   showOrHideProducByStores(product) {
@@ -150,7 +184,7 @@ export default class App extends Component {
     }
   }
 
-  signIn = async () => {
+  async googleSignIn() {
     try {
       const result = await Google.logInAsync({
         androidClientId: "246004460762-6ac3ug1la8sill81a2j03vkl1oo1rhgu.apps.googleusercontent.com",
@@ -163,6 +197,7 @@ export default class App extends Component {
           name: result.user.name,
           photoUrl: result.user.photoUrl
         })
+        this.storeUser({name: result.user.name})
       } else {
         console.log("cancelled")
       }
@@ -183,7 +218,8 @@ export default class App extends Component {
         {
           this.state.activeApp
           ?
-            this.state.signedIn ?
+            this.getUser()
+            ?
               <React.Fragment>
                 <View style={styles.searchSection}>
                   <TextInput
@@ -205,11 +241,12 @@ export default class App extends Component {
                     userName={this.state.name}
                     products={products}
                     showOrHideProducByStores={this.showOrHideProducByStores.bind(this)}
+                    googleLog={this.googleLog.bind(this)}
                   />
                 )}
               </React.Fragment>
             :
-              <LoginPage signIn={this.signIn} />
+              <LoginPage googleSignIn={this.googleSignIn.bind(this)} />
           :
             <View style={styles.activeApp}><Text style={styles.title}>Aplicación no activa</Text></View>
         }
@@ -261,5 +298,11 @@ const styles = StyleSheet.create({
   },
   header: {
     fontSize: 25
+  },
+  loading: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'flex-end',
+    marginBottom: 40
   },
 });
