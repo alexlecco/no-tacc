@@ -127,9 +127,20 @@ export default class App extends Component {
           name: child.val().name,
           brand: child.val().brand,
           quantity: child.val().quantity,
+          marsh3Allowed: child.val().marsh3Allowed,
           _key: child.key
         });
       });
+
+      // HARDCODED USER..PLEASE DELETE
+      let hipoteticUser = { celiaquia3: true };
+
+      // POP PRODUCTS W CELIAC IMCOMPATIBLE WITH THE USER
+      for(product in products){
+        if(hipoteticUser.celiaquia3 != product.marsh3Allowed){
+          products.pop(product);
+        }
+      }
 
       this.setState({
         allProducts: products,
@@ -146,7 +157,8 @@ export default class App extends Component {
   }
 
   filterSearch(text) {
-    let filteredProducts = this.state.allProducts.filter(product =>
+   
+    let filteredProducts = this.state.allProducts.filter(product => 
       product.name.toLowerCase().includes(text.toLowerCase())
     );
 
