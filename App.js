@@ -24,8 +24,14 @@ import * as Google from 'expo-google-app-auth';
 const LoginPage = props => {
   return (
     <View style={styles.loading}>
-      <Button title="ingresá con Google" 
-       onPress={() => props.googleSignIn()} />
+      {
+        !props.getUser()
+        ?
+          <View />
+        :
+          <Button title="ingresá con Google"
+          onPress={() => props.googleSignIn()} />
+      }
     </View>
   )
 }
@@ -42,8 +48,8 @@ export default class App extends Component {
       textInputStatus: 'untouched',
       activeApp: true,
       signedIn: false,
-      name: "",
-      photoUrl: ""
+      name: '',
+      photoUrl: ''
     };
 
     this.productsRef = firebaseApp.database().ref().child('products');
@@ -51,9 +57,10 @@ export default class App extends Component {
     this.usersRef = firebaseApp.database().ref().child('users');
     
     showOrHideProducByStores = this.showOrHideProducByStores.bind(this);
-    googleLog = this.googleLog.bind(this);
+    googleSignOut = this.googleSignOut.bind(this);
     clearText = this.clearText.bind(this);
     googleSignIn = this.googleSignIn.bind(this);
+    getUser = this.getUser.bind(this);
 
     console.disableYellowBox = true;
     console.warn('YellowBox is disabled.');
@@ -89,11 +96,6 @@ export default class App extends Component {
     } catch (error) {
       console.log("Something went wrong", error);
     }
-  }
-
-  googleLog() {
-    AsyncStorage.clear();
-    this.setState({signedIn: false, name: ''})
   }
 
   showOrHideProducByStores(product) {
@@ -184,6 +186,12 @@ export default class App extends Component {
     }
   }
 
+  
+
+
+
+
+
   async googleSignIn() {
     try {
       const result = await Google.logInAsync({
@@ -207,8 +215,14 @@ export default class App extends Component {
     }
   }
 
+  async googleSignOut() {
+    AsyncStorage.clear();
+    this.setState({signedIn: false, name: ''})
+  }
+
   render() {
-    const { products, product } = this.state;
+    const { products, product, signedIn } = this.state;
+    console.log("state::::::", this.state)
 
     return (
       <SafeAreaView style={styles.container}>
@@ -218,7 +232,7 @@ export default class App extends Component {
         {
           this.state.activeApp
           ?
-            this.getUser()
+            signedIn
             ?
               <React.Fragment>
                 <View style={styles.searchSection}>
@@ -241,12 +255,12 @@ export default class App extends Component {
                     userName={this.state.name}
                     products={products}
                     showOrHideProducByStores={this.showOrHideProducByStores.bind(this)}
-                    googleLog={this.googleLog.bind(this)}
+                    googleSignOut={this.googleSignOut.bind(this)}
                   />
                 )}
               </React.Fragment>
             :
-              <LoginPage googleSignIn={this.googleSignIn.bind(this)} />
+              <LoginPage getUser={this.getUser.bind(this)} googleSignIn={this.googleSignIn.bind(this)} />
           :
             <View style={styles.activeApp}><Text style={styles.title}>Aplicación no activa</Text></View>
         }

@@ -8,6 +8,7 @@ import { Spinner } from 'native-base';
 export default class ProductSearchResults extends Component {
     render() {
         const { products, showOrHideProducByStores, userName } = this.props;
+        const showLogOutButton = false;
         
         return(
             products.length === 0 ?
@@ -16,7 +17,7 @@ export default class ProductSearchResults extends Component {
                 :
                 <React.Fragment>
                     <Text style={styles.title}> Bienvenido {userName} </Text>
-                    {false && <Button title="salir" onPress={() => this.props.googleLogOut()} />}
+                    {showLogOutButton && <Button title="salir" onPress={() => this.props.googleSignOut()} />}
                     <Text style={styles.title}> { products.length } productos encontrados </Text>
                     <FlatList
                         style={styles.flatList}
@@ -45,4 +46,3 @@ const styles = StyleSheet.create({
         flex: .5
     }
 });
-  
