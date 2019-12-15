@@ -9,7 +9,9 @@ import {
   StatusBar,
   TextInput,
   TouchableOpacity,
-  Image
+  Image,
+  Button,
+  AsyncStorage
 } from 'react-native';
 
 import colors from './constants/Colors';
@@ -17,6 +19,22 @@ import ProductSearchResults from './components/ProductSearchResults';
 import ProductByStores from './components/ProductByStores';
 
 import { firebaseApp } from './config/firebase';
+import * as Google from 'expo-google-app-auth';
+
+const LoginPage = props => {
+  return (
+    <View style={styles.loading}>
+      {
+        !props.getUser()
+        ?
+          <View />
+        :
+          <Button title="ingresá con Google"
+          onPress={() => props.googleSignIn()} />
+      }
+    </View>
+  )
+}
 
 export default class App extends Component {
   constructor(props) {
@@ -28,13 +46,21 @@ export default class App extends Component {
       searchText: '',
       allProducts: [],
       textInputStatus: 'untouched',
-      activeApp: true
+      activeApp: true,
+      signedIn: false,
+      name: '',
+      photoUrl: ''
     };
 
     this.productsRef = firebaseApp.database().ref().child('products');
     this.activeAppRef = firebaseApp.database().ref().child('activeApp');
-    showOrHideProducByStores = this.showOrHideProducByStores.bind(this);
+    this.usersRef = firebaseApp.database().ref().child('users');
+    
+    showOrHideProductByStores = this.showOrHideProductByStores.bind(this);
+    googleSignOut = this.googleSignOut.bind(this);
     clearText = this.clearText.bind(this);
+    googleSignIn = this.googleSignIn.bind(this);
+    getUser = this.getUser.bind(this);
 
     console.disableYellowBox = true;
     console.warn('YellowBox is disabled.');
@@ -45,9 +71,34 @@ export default class App extends Component {
   componentWillMount() {
     this.listenForProducts(this.productsRef);
     this.listenForActiveApp(this.activeAppRef);
+    this.getUser();
   }
 
-  showOrHideProducByStores(product) {
+  async storeUser(user) {
+    try {
+       await AsyncStorage.setItem("user", JSON.stringify(user));
+       
+    } catch (error) {
+      console.log("Something went wrong", error);
+    }
+  }
+
+  async getUser() {
+    try {
+      let userData = await AsyncStorage.getItem("user");
+      let data = JSON.parse(userData);
+      if(data !== null) {
+        this.setState({signedIn: true, name: data.name})
+        return true;
+      } else {
+        return false;
+      }
+    } catch (error) {
+      console.log("Something went wrong", error);
+    }
+  }
+
+  showOrHideProductByStores(product) {
     if (!this.state.ProductByStoresVisible) {
       this.setState({
         ProductByStoresVisible: !this.state.ProductByStoresVisible,
@@ -147,8 +198,43 @@ export default class App extends Component {
     }
   }
 
+  
+
+
+
+
+
+  async googleSignIn() {
+    try {
+      const result = await Google.logInAsync({
+        androidClientId: "246004460762-6ac3ug1la8sill81a2j03vkl1oo1rhgu.apps.googleusercontent.com",
+        scopes: ["profile", "email"]
+      })
+
+      if (result.type === "success") {
+        this.setState({
+          signedIn: true,
+          name: result.user.name,
+          photoUrl: result.user.photoUrl
+        })
+        this.storeUser({name: result.user.name})
+      } else {
+        console.log("cancelled")
+      }
+
+    } catch (e) {
+      console.log("error", e)
+    }
+  }
+
+  async googleSignOut() {
+    AsyncStorage.clear();
+    this.setState({signedIn: false, name: ''})
+  }
+
   render() {
-    const { products, product } = this.state;
+    const { products, product, signedIn } = this.state;
+    console.log("state::::::", this.state)
 
     return (
       <SafeAreaView style={styles.container}>
@@ -158,29 +244,35 @@ export default class App extends Component {
         {
           this.state.activeApp
           ?
-            <React.Fragment>
-              <View style={styles.searchSection}>
-                <TextInput
-                  style={styles.textInput}
-                  onChangeText={text => this.filterSearch(text)}
-                  value={this.state.searchText}
-                  placeholder='Buscar producto'
-                />
-                {this.renderClearButton()}
-              </View>
+            signedIn
+            ?
+              <React.Fragment>
+                <View style={styles.searchSection}>
+                  <TextInput
+                    style={styles.textInput}
+                    onChangeText={text => this.filterSearch(text)}
+                    value={this.state.searchText}
+                    placeholder='Buscar producto'
+                  />
+                  {this.renderClearButton()}
+                </View>
 
-              {this.state.ProductByStoresVisible ? (
-                <ProductByStores
-                  product={product}
-                  showOrHideProducByStores={this.showOrHideProducByStores.bind(this)}
-                />
-              ) : (
-                <ProductSearchResults
-                  products={products}
-                  showOrHideProducByStores={this.showOrHideProducByStores.bind(this)}
-                />
-              )}
-            </React.Fragment>
+                {this.state.ProductByStoresVisible ? (
+                  <ProductByStores
+                    product={product}
+                    showOrHideProductByStores={this.showOrHideProductByStores.bind(this)}
+                  />
+                ) : (
+                  <ProductSearchResults
+                    userName={this.state.name}
+                    products={products}
+                    showOrHideProductByStores={this.showOrHideProductByStores.bind(this)}
+                    googleSignOut={this.googleSignOut.bind(this)}
+                  />
+                )}
+              </React.Fragment>
+            :
+              <LoginPage getUser={this.getUser.bind(this)} googleSignIn={this.googleSignIn.bind(this)} />
           :
             <View style={styles.activeApp}><Text style={styles.title}>Aplicación no activa</Text></View>
         }
@@ -229,5 +321,14 @@ const styles = StyleSheet.create({
   },
   title: {
       color: colors.white,
+  },
+  header: {
+    fontSize: 25
+  },
+  loading: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'flex-end',
+    marginBottom: 40
   },
 });

@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { StyleSheet, View, Text, FlatList } from 'react-native';
+import { StyleSheet, View, Text, FlatList, Button } from 'react-native';
 import colors from '../constants/Colors';
 import ProductCard from './ProductCard';
 import { Spinner } from 'native-base';
@@ -7,7 +7,8 @@ import { Spinner } from 'native-base';
 
 export default class ProductSearchResults extends Component {
     render() {
-        const { products, showOrHideProducByStores } = this.props;
+        const { products, showOrHideProductByStores, userName } = this.props;
+        const showLogOutButton = false;
         
         return(
             products.length === 0 ?
@@ -15,11 +16,13 @@ export default class ProductSearchResults extends Component {
 
                 :
                 <React.Fragment>
+                    <Text style={styles.title}> Bienvenido {userName} </Text>
+                    {showLogOutButton && <Button title="salir" onPress={() => this.props.googleSignOut()} />}
                     <Text style={styles.title}> { products.length } productos encontrados </Text>
                     <FlatList
                         style={styles.flatList}
                         data={products}
-                        renderItem={product => <ProductCard product={product} showOrHideProducByStores={showOrHideProducByStores} />}
+                        renderItem={product => <ProductCard product={product} showOrHideProductByStores={showOrHideProductByStores} />}
                         keyExtractor={(product, index) => { return product.id.toString() }}
                     />
                 </React.Fragment>
@@ -43,4 +46,3 @@ const styles = StyleSheet.create({
         flex: .5
     }
 });
-  

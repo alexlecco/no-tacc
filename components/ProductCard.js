@@ -15,7 +15,7 @@ export default class ProductCard extends Component {
   }
 
   selectProduct(product) {
-    this.props.showOrHideProducByStores(product);
+    this.props.showOrHideProductByStores(product);
   }
 
   render() {

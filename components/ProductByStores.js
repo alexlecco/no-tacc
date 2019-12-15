@@ -73,7 +73,7 @@ export default class ProductByStores extends Component {
           </View>
           <Button
             title="volver"
-            onPress={() => this.props.showOrHideProducByStores(product)}
+            onPress={() => this.props.showOrHideProductByStores(product)}
           />
         </View>
     );
