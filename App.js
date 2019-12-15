@@ -56,7 +56,7 @@ export default class App extends Component {
     this.activeAppRef = firebaseApp.database().ref().child('activeApp');
     this.usersRef = firebaseApp.database().ref().child('users');
     
-    showOrHideProducByStores = this.showOrHideProducByStores.bind(this);
+    showOrHideProductByStores = this.showOrHideProductByStores.bind(this);
     googleSignOut = this.googleSignOut.bind(this);
     clearText = this.clearText.bind(this);
     googleSignIn = this.googleSignIn.bind(this);
@@ -98,7 +98,7 @@ export default class App extends Component {
     }
   }
 
-  showOrHideProducByStores(product) {
+  showOrHideProductByStores(product) {
     if (!this.state.ProductByStoresVisible) {
       this.setState({
         ProductByStoresVisible: !this.state.ProductByStoresVisible,
@@ -260,13 +260,13 @@ export default class App extends Component {
                 {this.state.ProductByStoresVisible ? (
                   <ProductByStores
                     product={product}
-                    showOrHideProducByStores={this.showOrHideProducByStores.bind(this)}
+                    showOrHideProductByStores={this.showOrHideProductByStores.bind(this)}
                   />
                 ) : (
                   <ProductSearchResults
                     userName={this.state.name}
                     products={products}
-                    showOrHideProducByStores={this.showOrHideProducByStores.bind(this)}
+                    showOrHideProductByStores={this.showOrHideProductByStores.bind(this)}
                     googleSignOut={this.googleSignOut.bind(this)}
                   />
                 )}

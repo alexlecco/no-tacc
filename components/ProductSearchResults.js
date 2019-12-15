@@ -7,7 +7,7 @@ import { Spinner } from 'native-base';
 
 export default class ProductSearchResults extends Component {
     render() {
-        const { products, showOrHideProducByStores, userName } = this.props;
+        const { products, showOrHideProductByStores, userName } = this.props;
         const showLogOutButton = false;
         
         return(
@@ -22,7 +22,7 @@ export default class ProductSearchResults extends Component {
                     <FlatList
                         style={styles.flatList}
                         data={products}
-                        renderItem={product => <ProductCard product={product} showOrHideProducByStores={showOrHideProducByStores} />}
+                        renderItem={product => <ProductCard product={product} showOrHideProductByStores={showOrHideProductByStores} />}
                         keyExtractor={(product, index) => { return product.id.toString() }}
                     />
                 </React.Fragment>
