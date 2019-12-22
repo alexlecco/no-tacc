@@ -24,17 +24,17 @@ import * as Google from 'expo-google-app-auth';
 const LoginPage = props => {
   return (
     <View style={styles.loading}>
-      {
-        !props.getUser()
-        ?
-          <View />
-        :
-          <Button title="ingresá con Google"
-          onPress={() => props.googleSignIn()} />
-      }
+      {!props.getUser() ? (
+        <View />
+      ) : (
+        <Button
+          title='ingresá con Google'
+          onPress={() => props.googleSignIn()}
+        />
+      )}
     </View>
-  )
-}
+  );
+};
 
 export default class App extends Component {
   constructor(props) {
@@ -52,10 +52,19 @@ export default class App extends Component {
       photoUrl: ''
     };
 
-    this.productsRef = firebaseApp.database().ref().child('products');
-    this.activeAppRef = firebaseApp.database().ref().child('activeApp');
-    this.usersRef = firebaseApp.database().ref().child('users');
-    
+    this.productsRef = firebaseApp
+      .database()
+      .ref()
+      .child('products');
+    this.activeAppRef = firebaseApp
+      .database()
+      .ref()
+      .child('activeApp');
+    this.usersRef = firebaseApp
+      .database()
+      .ref()
+      .child('users');
+
     showOrHideProductByStores = this.showOrHideProductByStores.bind(this);
     googleSignOut = this.googleSignOut.bind(this);
     clearText = this.clearText.bind(this);
@@ -76,25 +85,24 @@ export default class App extends Component {
 
   async storeUser(user) {
     try {
-       await AsyncStorage.setItem("user", JSON.stringify(user));
-       
+      await AsyncStorage.setItem('user', JSON.stringify(user));
     } catch (error) {
-      console.log("Something went wrong", error);
+      console.log('Something went wrong', error);
     }
   }
 
   async getUser() {
     try {
-      let userData = await AsyncStorage.getItem("user");
+      let userData = await AsyncStorage.getItem('user');
       let data = JSON.parse(userData);
-      if(data !== null) {
-        this.setState({signedIn: true, name: data.name})
+      if (data !== null) {
+        this.setState({ signedIn: true, name: data.name });
         return true;
       } else {
         return false;
       }
     } catch (error) {
-      console.log("Something went wrong", error);
+      console.log('Something went wrong', error);
     }
   }
 
@@ -136,8 +144,8 @@ export default class App extends Component {
       let hipoteticUser = { celiaquia3: true };
 
       // POP PRODUCTS W CELIAC IMCOMPATIBLE WITH THE USER
-      for(product in products){
-        if(hipoteticUser.celiaquia3 != product.marsh3Allowed){
+      for (product in products) {
+        if (hipoteticUser.celiaquia3 != product.marsh3Allowed) {
           products.pop(product);
         }
       }
@@ -157,8 +165,7 @@ export default class App extends Component {
   }
 
   filterSearch(text) {
-   
-    let filteredProducts = this.state.allProducts.filter(product => 
+    let filteredProducts = this.state.allProducts.filter(product =>
       product.name.toLowerCase().includes(text.toLowerCase())
     );
 
@@ -175,12 +182,12 @@ export default class App extends Component {
       searchText: ''
     });
 
-    this.restartSearch()
+    this.restartSearch();
   }
 
   restartSearch() {
     this.listenForProducts(this.productsRef);
-    this.setState({ProductByStoresVisible: false})
+    this.setState({ ProductByStoresVisible: false });
   }
 
   renderClearButton() {
@@ -194,90 +201,159 @@ export default class App extends Component {
         </TouchableOpacity>
       );
     } else {
-      return <View/ >;
+      return <View />;
     }
   }
 
-  
+  //SIGN IN FLOW f/ FIREBASE
+  onSignIn = googleUser => {
+    console.log('Google Auth Response', googleUser);
+    // We need to register an Observer on Firebase Auth to make sure auth is initialized.
+    var unsubscribe = firebaseApp
+      .auth()
+      .onAuthStateChanged(function(firebaseUser) {
+        unsubscribe();
+        // Check if we are already signed-in Firebase with the correct user.
+        if (!this.isUserEqual(googleUser, firebaseUser)) {
+          // Build Firebase credential with the Google ID token.
+          var credential = firebaseApp.auth.GoogleAuthProvider.credential(
+            googleUser.idToken,
+            googleUser.accessToken
+          );
+          // Sign in with credential from the Google user.
+          firebaseApp
+            .auth()
+            .signInWithCredential(credential).then(function(){console.log('user sign in')})
+            .catch(function(error) {
+              // Handle Errors here.
+              var errorCode = error.code;
+              var errorMessage = error.message;
+              // The email of the user's account used.
+              var email = error.email;
+              // The firebase.auth.AuthCredential type that was used.
+              var credential = error.credential;
+              console.log('Google Error', errorMessage);
 
+            });
+        } else {
+          console.log('User already signed-in Firebase.');
+        }
+      }.bind(this));
+  };
 
-
-
+  isUserEqual = (googleUser, firebaseUser) => {
+    if (firebaseUser) {
+      var providerData = firebaseUser.providerData;
+      for (var i = 0; i < providerData.length; i++) {
+        if (
+          providerData[i].providerId ===
+            firebaseApp.auth.GoogleAuthProvider.PROVIDER_ID &&
+          providerData[i].uid === googleUser.getBasicProfile().getId()
+        ) {
+          // We don't need to reauth the Firebase connection.
+          return true;
+        }
+      }
+    }
+    return false;
+  };
 
   async googleSignIn() {
     try {
       const result = await Google.logInAsync({
-        androidClientId: "246004460762-6ac3ug1la8sill81a2j03vkl1oo1rhgu.apps.googleusercontent.com",
-        scopes: ["profile", "email"]
-      })
+        androidClientId:
+          '246004460762-6ac3ug1la8sill81a2j03vkl1oo1rhgu.apps.googleusercontent.com',
+        behavior: 'web',
+        scopes: ['profile', 'email']
+      });
 
-      if (result.type === "success") {
+      if (result.type === 'success') {
+        // const credential = firebaseApp.auth.GoogleAuthProvider.credential(
+        //   null,
+        //   result.accessToken
+        // );
+
+        // // Sign in with credential from the Google user.
+        // firebaseApp
+        //   .auth()
+        //   .signInWithCredential(credential)
+        //   .catch(error => {
+        //     console.log('error: ', error);
+        //     // Handle Errors here.
+        //   });
+
+        this.onSignIn(result);
         this.setState({
           signedIn: true,
           name: result.user.name,
           photoUrl: result.user.photoUrl
-        })
-        this.storeUser({name: result.user.name})
+        });
+        this.storeUser({ name: result.user.name });
       } else {
-        console.log("cancelled")
+        console.log('cancelled');
       }
-
     } catch (e) {
-      console.log("error", e)
+      console.log('error', e);
     }
   }
 
   async googleSignOut() {
     AsyncStorage.clear();
-    this.setState({signedIn: false, name: ''})
+    this.setState({ signedIn: false, name: '' });
   }
 
   render() {
     const { products, product, signedIn } = this.state;
-    console.log("state::::::", this.state)
+    // console.log("state::::::", this.state)
 
     return (
       <SafeAreaView style={styles.container}>
         {Platform.OS === 'ios' && <StatusBar barStyle='default' />}
         {Platform.OS === 'android' && <View style={styles.statusBarUnderlay} />}
 
-        {
-          this.state.activeApp
-          ?
-            signedIn
-            ?
-              <React.Fragment>
-                <View style={styles.searchSection}>
-                  <TextInput
-                    style={styles.textInput}
-                    onChangeText={text => this.filterSearch(text)}
-                    value={this.state.searchText}
-                    placeholder='Buscar producto'
-                  />
-                  {this.renderClearButton()}
-                </View>
+        {this.state.activeApp ? (
+          signedIn ? (
+            <React.Fragment>
+              <Button title='Salir' onPress={() => this.googleSignOut()} />
+              <View style={styles.searchSection}>
+                <TextInput
+                  style={styles.textInput}
+                  onChangeText={text => this.filterSearch(text)}
+                  value={this.state.searchText}
+                  placeholder='Buscar producto'
+                />
+                {this.renderClearButton()}
+              </View>
 
-                {this.state.ProductByStoresVisible ? (
-                  <ProductByStores
-                    product={product}
-                    showOrHideProductByStores={this.showOrHideProductByStores.bind(this)}
-                  />
-                ) : (
-                  <ProductSearchResults
-                    userName={this.state.name}
-                    products={products}
-                    showOrHideProductByStores={this.showOrHideProductByStores.bind(this)}
-                    googleSignOut={this.googleSignOut.bind(this)}
-                  />
-                )}
-              </React.Fragment>
-            :
-              <LoginPage getUser={this.getUser.bind(this)} googleSignIn={this.googleSignIn.bind(this)} />
-          :
-            <View style={styles.activeApp}><Text style={styles.title}>Aplicación no activa</Text></View>
-        }
-              
-        
+              {this.state.ProductByStoresVisible ? (
+                <ProductByStores
+                  product={product}
+                  showOrHideProductByStores={this.showOrHideProductByStores.bind(
+                    this
+                  )}
+                />
+              ) : (
+                <ProductSearchResults
+                  userName={this.state.name}
+                  products={products}
+                  showOrHideProductByStores={this.showOrHideProductByStores.bind(
+                    this
+                  )}
+                  googleSignOut={this.googleSignOut.bind(this)}
+                />
+              )}
+            </React.Fragment>
+          ) : (
+            <LoginPage
+              getUser={this.getUser.bind(this)}
+              googleSignIn={this.googleSignIn.bind(this)}
+            />
+          )
+        ) : (
+          <View style={styles.activeApp}>
+            <Text style={styles.title}>Aplicación no activa</Text>
+          </View>
+        )}
       </SafeAreaView>
     );
   }
@@ -317,10 +393,10 @@ const styles = StyleSheet.create({
   activeApp: {
     flex: 1,
     alignItems: 'center',
-    justifyContent: 'center',
+    justifyContent: 'center'
   },
   title: {
-      color: colors.white,
+    color: colors.white
   },
   header: {
     fontSize: 25
@@ -330,5 +406,5 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'flex-end',
     marginBottom: 40
-  },
+  }
 });
