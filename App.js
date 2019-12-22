@@ -207,7 +207,7 @@ export default class App extends Component {
 
   //SIGN IN FLOW f/ FIREBASE
   onSignIn = googleUser => {
-    console.log('Google Auth Response', googleUser);
+    // console.log('Google Auth Response', googleUser);
     // We need to register an Observer on Firebase Auth to make sure auth is initialized.
     var unsubscribe = firebaseApp
       .auth()
@@ -223,7 +223,23 @@ export default class App extends Component {
           // Sign in with credential from the Google user.
           firebaseApp
             .auth()
-            .signInWithCredential(credential).then(function(){console.log('user sign in')})
+            .signInWithCredential(credential).then(function(result) {
+              // console.log('result:', result);
+              // console.log(JSON.stringify(result));
+              // console.log('Google sign in');
+              firebaseApp.database()
+              .ref('users/').child(result.user.uid)
+              .set({
+                mail: result.user.email,
+                profile_picture: result.additionalUserInfo.profile.picture,
+                locale: result.additionalUserInfo.profile.locale,
+                first_name: result.additionalUserInfo.profile.given_name,
+                last_name: result.additionalUserInfo.profile.family_name,
+              })
+              .then(function (snapshot) {
+                // console.log('Snapshot: ',snapshot);
+              });
+            })
             .catch(function(error) {
               // Handle Errors here.
               var errorCode = error.code;
@@ -263,25 +279,10 @@ export default class App extends Component {
       const result = await Google.logInAsync({
         androidClientId:
           '246004460762-6ac3ug1la8sill81a2j03vkl1oo1rhgu.apps.googleusercontent.com',
-        behavior: 'web',
         scopes: ['profile', 'email']
       });
 
       if (result.type === 'success') {
-        // const credential = firebaseApp.auth.GoogleAuthProvider.credential(
-        //   null,
-        //   result.accessToken
-        // );
-
-        // // Sign in with credential from the Google user.
-        // firebaseApp
-        //   .auth()
-        //   .signInWithCredential(credential)
-        //   .catch(error => {
-        //     console.log('error: ', error);
-        //     // Handle Errors here.
-        //   });
-
         this.onSignIn(result);
         this.setState({
           signedIn: true,
