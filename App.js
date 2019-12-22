@@ -209,9 +209,8 @@ export default class App extends Component {
   onSignIn = googleUser => {
     // console.log('Google Auth Response', googleUser);
     // We need to register an Observer on Firebase Auth to make sure auth is initialized.
-    var unsubscribe = firebaseApp
-      .auth()
-      .onAuthStateChanged(function(firebaseUser) {
+    var unsubscribe = firebaseApp.auth().onAuthStateChanged(
+      function(firebaseUser) {
         unsubscribe();
         // Check if we are already signed-in Firebase with the correct user.
         if (!this.isUserEqual(googleUser, firebaseUser)) {
@@ -223,22 +222,35 @@ export default class App extends Component {
           // Sign in with credential from the Google user.
           firebaseApp
             .auth()
-            .signInWithCredential(credential).then(function(result) {
-              // console.log('result:', result);
-              // console.log(JSON.stringify(result));
-              // console.log('Google sign in');
-              firebaseApp.database()
-              .ref('users/').child(result.user.uid)
-              .set({
-                mail: result.user.email,
-                profile_picture: result.additionalUserInfo.profile.picture,
-                locale: result.additionalUserInfo.profile.locale,
-                first_name: result.additionalUserInfo.profile.given_name,
-                last_name: result.additionalUserInfo.profile.family_name,
-              })
-              .then(function (snapshot) {
-                // console.log('Snapshot: ',snapshot);
-              });
+            .signInWithCredential(credential)
+            .then(function(result) {
+              if (result.additionalUserInfo.isNewUser) {
+                // console.log('result:', result);
+                // console.log(JSON.stringify(result));
+                // console.log('Google sign in');
+                firebaseApp
+                  .database()
+                  .ref('users/' + result.user.uid)
+                  .set({
+                    mail: result.user.email,
+                    profile_picture: result.additionalUserInfo.profile.picture,
+                    locale: result.additionalUserInfo.profile.locale,
+                    first_name: result.additionalUserInfo.profile.given_name,
+                    last_name: result.additionalUserInfo.profile.family_name,
+                    celiaquia3: false //MARSH 3 CELIAC LEVEL FALSE FOR DEFAULT
+                  })
+                  .then(function(snapshot) {
+                    // console.log('Snapshot: ',snapshot);
+                  });
+              } else {
+                firebaseApp
+                  .database()
+                  .ref('users/' + result.user.uid)
+                  .update({
+                    //UPDATE DATA
+                  });
+
+              }
             })
             .catch(function(error) {
               // Handle Errors here.
@@ -249,12 +261,12 @@ export default class App extends Component {
               // The firebase.auth.AuthCredential type that was used.
               var credential = error.credential;
               console.log('Google Error', errorMessage);
-
             });
         } else {
           console.log('User already signed-in Firebase.');
         }
-      }.bind(this));
+      }.bind(this)
+    );
   };
 
   isUserEqual = (googleUser, firebaseUser) => {
