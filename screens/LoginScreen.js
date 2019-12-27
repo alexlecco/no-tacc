@@ -4,6 +4,9 @@ import * as Google from 'expo-google-app-auth';
 import { firebaseApp } from '../config/firebase';
 
 class LoginScreen extends Component {
+    constructor(prods){
+        super(prods);
+    }
   //SIGN IN FLOW f/ FIREBASE
   onSignIn = googleUser => {
     // console.log('Google Auth Response', googleUser);
