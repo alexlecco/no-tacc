@@ -21,6 +21,14 @@ import ProductByStores from './components/ProductByStores';
 import { firebaseApp } from './config/firebase';
 import * as Google from 'expo-google-app-auth';
 
+import { createAppContainer,createSwitchNavigator } from 'react-navigation';
+
+import LoadingScreen from './screens/LoadingScreen';
+import LoginScreen from './screens/LoginScreen';
+import ProductsScreen from './screens/ProductsScreen';
+import ProfileScreen from './screens/ProfileScreen';
+import SearchScreen from './screens/SearchScreen';
+
 const LoginPage = props => {
   return (
     <View style={styles.loading}>
@@ -35,6 +43,17 @@ const LoginPage = props => {
     </View>
   );
 };
+
+
+const AppSwitchNavigator = createSwitchNavigator({
+  LoadingScreen:LoadingScreen, 
+  LoginScreen:LoginScreen, 
+  ProductsScreen:ProductsScreen, 
+  ProfileScreen:ProfileScreen, 
+  SearchScreen:SearchScreen, 
+});
+
+const AppNavigator = createAppContainer(AppSwitchNavigator);
 
 export default class App extends Component {
   constructor(props) {
@@ -327,34 +346,7 @@ export default class App extends Component {
         {this.state.activeApp ? (
           signedIn ? (
             <React.Fragment>
-              <Button title='Salir' onPress={() => this.googleSignOut()} />
-              <View style={styles.searchSection}>
-                <TextInput
-                  style={styles.textInput}
-                  onChangeText={text => this.filterSearch(text)}
-                  value={this.state.searchText}
-                  placeholder='Buscar producto'
-                />
-                {this.renderClearButton()}
-              </View>
-
-              {this.state.ProductByStoresVisible ? (
-                <ProductByStores
-                  product={product}
-                  showOrHideProductByStores={this.showOrHideProductByStores.bind(
-                    this
-                  )}
-                />
-              ) : (
-                <ProductSearchResults
-                  userName={this.state.name}
-                  products={products}
-                  showOrHideProductByStores={this.showOrHideProductByStores.bind(
-                    this
-                  )}
-                  googleSignOut={this.googleSignOut.bind(this)}
-                />
-              )}
+              <AppNavigator/>
             </React.Fragment>
           ) : (
             <LoginPage
