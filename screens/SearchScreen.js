@@ -1,9 +1,62 @@
 import React, { Component } from 'react';
-import { View, Text, StyleSheet, SafeAreaView, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, SafeAreaView, TouchableOpacity, Image } from 'react-native';
 import { Button, Icon } from 'native-base';
 import Colors from '../constants/Colors';
 
 class SearchScreen extends Component {
+  constructor(props){
+    super(props);
+  }
+  filterSearch(text) {
+    // let filteredProducts = this.state.allProducts.filter(product =>
+      // product.name.toLowerCase().includes(text.toLowerCase())
+    // );
+
+    // this.setState({
+      // products: filteredProducts,
+      // searchText: text,
+      // textInputStatus: 'touched'
+    // });
+  }
+
+  clearText() {
+    // this.setState({
+    //   textInputStatus: 'untouched',
+    //   searchText: ''
+    // });
+
+    // this.restartSearch();
+  }
+
+  restartSearch() {
+    // this.listenForProducts(this.productsRef);
+    // this.setState({ ProductByStoresVisible: false });
+  }
+
+  renderClearButton() {
+    // if (this.state.textInputStatus == 'touched') {
+    //   return (
+    //     <TouchableOpacity onPress={() => this.clearText()}>
+    //       <Image
+    //         style={styles.button}
+    //         source={require('./assets/img/clear-input.png')}
+    //       />
+    //     </TouchableOpacity>
+    //   );
+    // } else {
+    //   return <View />;
+    // }
+  }
+
+
+  renderSearchBar(){
+    return (
+      <Text>SEARCH BAR</Text>
+
+    );
+  }
+
+
   render() {
     return (
       <SafeAreaView style={styles.container}>
@@ -22,7 +75,7 @@ class SearchScreen extends Component {
         </View>
         <View style={styles.searchBar}>
           <Text>Por favor, Ingrese el nombre del producto</Text>
-          <Text>SEARCH BAR</Text>
+          {this.renderSearchBar()}
         </View>
       </SafeAreaView>
     );
