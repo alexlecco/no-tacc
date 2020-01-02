@@ -4,8 +4,13 @@ import * as Google from 'expo-google-app-auth';
 import { firebaseApp } from '../config/firebase';
 
 class LoginScreen extends Component {
-    constructor(prods){
-        super(prods);
+    constructor(props){
+        super(props);
+        this.state = {
+          uid: '',
+          isOk: false
+        };
+
     }
   //SIGN IN FLOW f/ FIREBASE
   onSignIn = googleUser => {
@@ -52,6 +57,7 @@ class LoginScreen extends Component {
                     //UPDATE DATA
                   });
               }
+              this.setState({uid: result.user.uid}).bind(this);  
             })
             .catch(function(error) {
               // Handle Errors here.
@@ -97,12 +103,8 @@ class LoginScreen extends Component {
 
       if (result.type === 'success') {
         this.onSignIn(result);
-        // this.setState({
-        //   signedIn: true,
-        //   name: result.user.name,
-        //   photoUrl: result.user.photoUrl
-        // });
-        // this.storeUser({ name: result.user.name });
+        this.storeUser({ name: result.user.name });
+        this.setState({isOK: true})
       } else {
         console.log('cancelled');
       }
@@ -116,14 +118,19 @@ class LoginScreen extends Component {
   }
 
   render() {
+    const uid = this.state.uid;
     return (
       <View style={styles.container}>
-        <Button
+        {this.state.isOk ? (
+          this.props.navigation.navigate('SearchScreen', uid)
+        ) : (
+          <Button
           title='ingresá con Google'
           onPress={() => {
             this.googleSignIn();
           }}
         />
+        )}
       </View>
     );
   }
