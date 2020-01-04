@@ -45,13 +45,8 @@ class SearchScreen extends Component {
       textInputStatus: 'untouched',
       searchText: ''
     });
-    this.restartSearch();
   }
 
-  restartSearch() {
-    // this.listenForProducts(this.productsRef);
-    // this.setState({ ProductByStoresVisible: false });
-  }
 
   renderClearButton() {
     if (this.state.textInputStatus == 'touched') {

@@ -17,7 +17,8 @@ class LoadingScreen extends Component {
       function(user) {
         if (user) {
           const uid = user.uid;
-          this.props.navigation.navigate('SearchScreen', { uid });
+          // this.props.navigation.navigate('SearchScreen', { uid });
+          this.props.navigation.navigate('ProfileScreen', { uid });
         } else {
           this.props.navigation.navigate('LoginScreen');
         }
