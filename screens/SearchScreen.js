@@ -109,15 +109,16 @@ class SearchScreen extends Component {
       snap.forEach(child => {
         // console.log('marsh: ',child.val().marsh3Allowed);
         // console.log('celic status: ', userCeliacStatus);
-        if (child.val().marsh3Allowed == userCeliacStatus) {
-          products.push({
-            id: child.val().id,
-            name: child.val().name,
-            brand: child.val().brand,
-            quantity: child.val().quantity,
-            marsh3Allowed: child.val().marsh3Allowed,
-            _key: child.key
-          });
+        products.push({
+          id: child.val().id,
+          name: child.val().name,
+          brand: child.val().brand,
+          quantity: child.val().quantity,
+          marsh3Allowed: child.val().marsh3Allowed,
+          _key: child.key
+        });
+        if(userCeliacStatus && (child.val().marsh3Allowed != userCeliacStatus)){
+          products.pop(child);
         }
       });
       //? FILTER PRODUCTS BY NAME
