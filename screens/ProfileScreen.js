@@ -1,9 +1,10 @@
 import React, { Component } from 'react';
-import { StyleSheet, Text, View, Image, TouchableOpacity } from 'react-native';
-import { Picker, Button, Icon } from 'native-base';
+import { StyleSheet, Text, View, Image, SafeAreaView, Button } from 'react-native';
+import { Picker, Icon } from 'native-base';
 
 import { firebaseApp } from '../config/firebase';
 import colors from '../constants/Colors';
+import { TouchableOpacity } from 'react-native-gesture-handler';
 
 class ProfileScreen extends Component {
   constructor(props) {
@@ -11,7 +12,8 @@ class ProfileScreen extends Component {
     this.state = {
       user: {
         first_name: '',
-        last_name: ''
+        last_name: '',
+        celiacStatus: false
       },
       selected: 'key0'
     };
@@ -46,10 +48,22 @@ class ProfileScreen extends Component {
     this.setState({
       selected: value
     });
+    switch(value){
+      case 'key0':
+        this.state.user.celiacStatus = false;
+        break;
+      case 'key1':
+        this.state.user.celiacStatus = true;
+        break;
+    }
+    // console.log(this.state.user);
+  }
+  next(){
+    // this.firebaseApp.database().ref('users/' + this.props.navigation.uid).set({celiaquia3: this.state.user.celiacStatus});   
   }
   render() {
     return (
-      <View style={styles.container}>
+      <SafeAreaView style={styles.container}>
         <View style={styles.header}></View>
         <Image
           style={styles.avatar}
@@ -72,14 +86,14 @@ class ProfileScreen extends Component {
               <Picker.Item label='Grado 2: Grave' value='key1' />
             </Picker>
           </View>
-          <View style={styles.floatAB}>
-            <Button iconRight light>
-              <Text>Next</Text>
-              <Icon name='arrow-forward' />
-            </Button>
-          </View>
+            <View style={styles.button}>
+              <TouchableOpacity style={{flexDirection: 'row'}} onPress={()=> this.next()}>
+                <Text>Continuar </Text>
+                <Icon name='arrow-forward' /> 
+              </TouchableOpacity>
+            </View>
         </View>
-      </View>
+      </SafeAreaView>
     );
   }
 }
@@ -125,24 +139,17 @@ const styles = StyleSheet.create({
     marginTop: 10,
     textAlign: 'center'
   },
-  buttonContainer: {
-    marginTop: 10,
-    height: 45,
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginBottom: 20,
-    width: 250,
-    borderRadius: 30,
-    backgroundColor: colors.secondaryColor
-  },
   picker: {
     width: '100%',
     color: colors.primaryTextColor,
     fontSize: 16
   },
-  floatAB: {
-    flex: 3,
-    display: 'none', //! PLS BORRAR
+  button: {
+    flexDirection: 'row',
+    marginBottom: 10,
+    alignSelf: 'flex-end',
+    position: 'absolute',
+    marginTop: 350,
+    paddingRight: 10
   }
 });
