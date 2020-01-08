@@ -15,35 +15,36 @@ class ProfileScreen extends Component {
         last_name: '',
         celiacStatus: false
       },
-      selected: 'key0'
+      selected: 'key0',
+      isUser: false,
     };
+    const { navigation } = this.props;
+    uid = navigation.getParam('uid');
     this.userRef = firebaseApp
       .database()
-      .ref()
-      .child('users');
+      .ref('users/' + uid);
   }
   async getUserData() {
-    const { navigation } = this.props;
-    const uid = navigation.getParam('uid');
     await this.userRef.once('value', snap => {
-      snap.forEach(child => {
-        if (child.key === uid)
           this.setState({
             user: {
-              celiacStatus: child.val().celiaquia3,
-              first_name: child.val().first_name,
-              last_name: child.val().last_name,
-              profile_picture: child.val().profile_picture
+              uid: snap.key,
+              celiacStatus: snap.val().celiaquia3,
+              first_name: snap.val().first_name,
+              last_name: snap.val().last_name,
+              profile_picture: snap.val().profile_picture
             }
           });
-      });
     });
+    this.state.isUser = true;
     // console.log('usuario: ', this.state.user);
   }
 
   componentDidMount() {
     this.getUserData();
   }
+
+
   onValueChange(value) {
     this.setState({
       selected: value
@@ -58,9 +59,16 @@ class ProfileScreen extends Component {
     }
     // console.log(this.state.user);
   }
+
+
+
   next(){
-    // this.firebaseApp.database().ref('users/' + this.props.navigation.uid).set({celiaquia3: this.state.user.celiacStatus});   
+    this.onValueChange(this.state.selected);
+    this.userRef.update({celiaquia3: this.state.user.celiacStatus});
+    this.props.navigation.navigate('SearchScreen', {uid: this.state.user.uid});
   }
+
+
   render() {
     return (
       <SafeAreaView style={styles.container}>
