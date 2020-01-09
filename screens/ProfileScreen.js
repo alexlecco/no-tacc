@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
-import { StyleSheet, Text, View, Image, SafeAreaView, Button } from 'react-native';
-import { Picker, Icon } from 'native-base';
+import { Picker, StyleSheet, Text, View, Image, SafeAreaView, Button, ActivityIndicator } from 'react-native';
+import { Icon } from 'native-base';
 
 import { firebaseApp } from '../config/firebase';
 import colors from '../constants/Colors';
@@ -33,10 +33,11 @@ class ProfileScreen extends Component {
               first_name: snap.val().first_name,
               last_name: snap.val().last_name,
               profile_picture: snap.val().profile_picture
-            }
+            },
+            isUser: true
           });
+          this.state.user.celiacStatus ? this.onValueChange('key1') : this.onValueChange('key0');
     });
-    this.state.isUser = true;
     // console.log('usuario: ', this.state.user);
   }
 
@@ -71,7 +72,9 @@ class ProfileScreen extends Component {
 
   render() {
     return (
-      <SafeAreaView style={styles.container}>
+      <SafeAreaView>
+        {this.state.isUser?(
+           <React.Fragment>
         <View style={styles.header}></View>
         <Image
           style={styles.avatar}
@@ -101,6 +104,10 @@ class ProfileScreen extends Component {
               </TouchableOpacity>
             </View>
         </View>
+        </React.Fragment>
+        ):
+          <ActivityIndicator style={styles.load} size='large' />
+        }
       </SafeAreaView>
     );
   }
@@ -112,6 +119,10 @@ const styles = StyleSheet.create({
     backgroundColor: colors.primaryDarkColor,
     height: 200
   },
+  load: {
+    paddingTop: 320
+  }
+  ,
   avatar: {
     width: 130,
     height: 130,
@@ -121,7 +132,8 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     alignSelf: 'center',
     position: 'absolute',
-    marginTop: 130
+    marginTop: 130,
+    backgroundColor: 'white'
   },
   body: {
     marginTop: 40
@@ -139,7 +151,7 @@ const styles = StyleSheet.create({
   info: {
     fontSize: 16,
     color: colors.primaryTextColor,
-    marginTop: 10
+    marginHorizontal: 10
   },
   description: {
     fontSize: 16,
@@ -148,9 +160,10 @@ const styles = StyleSheet.create({
     textAlign: 'center'
   },
   picker: {
-    width: '100%',
+    width: '80%',
     color: colors.primaryTextColor,
-    fontSize: 16
+    fontSize: 16,
+    // backgroundColor: colors.secondaryColor,
   },
   button: {
     flexDirection: 'row',
