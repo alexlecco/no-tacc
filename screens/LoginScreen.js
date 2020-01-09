@@ -47,7 +47,7 @@ class LoginScreen extends Component {
                     celiaquia3: false //MARSH 3 CELIAC LEVEL FALSE FOR DEFAULT
                   })
                   .then(function(snapshot) {
-                    // console.log('Snapshot: ',snapshot);
+                    console.log('Snapshot: ',snapshot);
                   });
               } else {
                 firebaseApp
@@ -57,7 +57,7 @@ class LoginScreen extends Component {
                     //UPDATE DATA
                   });
               }
-              this.setState({uid: result.user.uid}).bind(this);  
+              // this.setState({uid: result.user.uid}).bind(this);  
             })
             .catch(function(error) {
               // Handle Errors here.
@@ -103,8 +103,9 @@ class LoginScreen extends Component {
 
       if (result.type === 'success') {
         this.onSignIn(result);
-        this.storeUser({ name: result.user.name });
-        this.setState({isOK: true})
+        // this.storeUser({ name: result.user.name });
+        this.state.isOk = true;
+        this.state.uid = result.user.uid;
       } else {
         console.log('cancelled');
       }
