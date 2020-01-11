@@ -13,7 +13,7 @@ class ProfileScreen extends Component {
       user: {
         first_name: '',
         last_name: '',
-        celiacStatus: false
+        celiac_status: false
       },
       selected: 'key0',
       isUser: false,
@@ -29,14 +29,14 @@ class ProfileScreen extends Component {
           this.setState({
             user: {
               uid: snap.key,
-              celiacStatus: snap.val().celiaquia3,
+              celiac_status: snap.val().celiac_status,
               first_name: snap.val().first_name,
               last_name: snap.val().last_name,
               profile_picture: snap.val().profile_picture
             },
             isUser: true
           });
-          this.state.user.celiacStatus ? this.onValueChange('key1') : this.onValueChange('key0');
+          this.state.user.celiac_status ? this.onValueChange('key1') : this.onValueChange('key0');
     });
     // console.log('usuario: ', this.state.user);
   }
@@ -52,10 +52,10 @@ class ProfileScreen extends Component {
     });
     switch(value){
       case 'key0':
-        this.state.user.celiacStatus = false;
+        this.state.user.celiac_status = false;
         break;
       case 'key1':
-        this.state.user.celiacStatus = true;
+        this.state.user.celiac_status = true;
         break;
     }
     // console.log(this.state.user);
@@ -65,7 +65,7 @@ class ProfileScreen extends Component {
 
   next(){
     this.onValueChange(this.state.selected);
-    this.userRef.update({celiaquia3: this.state.user.celiacStatus});
+    this.userRef.update({celiac_status: this.state.user.celiac_status});
     this.props.navigation.navigate('SearchScreen', {uid: this.state.user.uid});
   }
 

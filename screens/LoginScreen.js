@@ -4,14 +4,12 @@ import * as Google from 'expo-google-app-auth';
 import { firebaseApp } from '../config/firebase';
 
 class LoginScreen extends Component {
-    constructor(props){
-        super(props);
-        this.state = {
-          uid: '',
-          isOk: false
-        };
-
-    }
+  constructor(props) {
+    super(props);
+    this.state = {
+      isFirstTime: false,
+    };
+  }
   //SIGN IN FLOW f/ FIREBASE
   onSignIn = googleUser => {
     // console.log('Google Auth Response', googleUser);
@@ -32,9 +30,6 @@ class LoginScreen extends Component {
             .signInWithCredential(credential)
             .then(function(result) {
               if (result.additionalUserInfo.isNewUser) {
-                // console.log('result:', result);
-                // console.log(JSON.stringify(result));
-                // console.log('Google sign in');
                 firebaseApp
                   .database()
                   .ref('users/' + result.user.uid)
@@ -44,20 +39,18 @@ class LoginScreen extends Component {
                     locale: result.additionalUserInfo.profile.locale,
                     first_name: result.additionalUserInfo.profile.given_name,
                     last_name: result.additionalUserInfo.profile.family_name,
-                    celiaquia3: false //MARSH 3 CELIAC LEVEL FALSE FOR DEFAULT
-                  })
-                  .then(function(snapshot) {
-                    console.log('Snapshot: ',snapshot);
+                    celiac_status: false //MARSH 3 CELIAC LEVEL FALSE FOR DEFAULT
                   });
+                  
               } else {
-                firebaseApp
-                  .database()
-                  .ref('users/' + result.user.uid)
-                  .update({
-                    //UPDATE DATA
-                  });
+                // ---------- UPDATE DATA ---------
+                // firebaseApp
+                //   .database()
+                //   .ref('users/' + result.user.uid)
+                //   .update({
+                //
+                //   });
               }
-              // this.setState({uid: result.user.uid}).bind(this);  
             })
             .catch(function(error) {
               // Handle Errors here.
@@ -104,8 +97,12 @@ class LoginScreen extends Component {
       if (result.type === 'success') {
         this.onSignIn(result);
         // this.storeUser({ name: result.user.name });
-        this.state.isOk = true;
-        this.state.uid = result.user.uid;
+        // console.log(this.state.isFirstTime);
+        if(true){
+          this.props.navigation.navigate('ProfileScreen', {uid: result.user.uid});
+        } else {
+          this.props.navigation.navigate('SearchScreen', {uid: result.user.uid});
+        } 
       } else {
         console.log('cancelled');
       }
@@ -119,19 +116,14 @@ class LoginScreen extends Component {
   }
 
   render() {
-    const uid = this.state.uid;
     return (
       <View style={styles.container}>
-        {this.state.isOk ? (
-          this.props.navigation.navigate('SearchScreen', uid)
-        ) : (
-          <Button
-          title='ingresá con Google'
-          onPress={() => {
-            this.googleSignIn();
-          }}
-        />
-        )}
+        <Button
+            title='ingresá con Google'
+            onPress={() => {
+              this.googleSignIn();
+            }}
+          />
       </View>
     );
   }

@@ -16,9 +16,8 @@ class LoadingScreen extends Component {
     firebase.auth().onAuthStateChanged(
       function(user) {
         if (user) {
-          const uid = user.uid;
-          // this.props.navigation.navigate('SearchScreen', { uid });
-          this.props.navigation.navigate('ProfileScreen', { uid });
+          this.props.navigation.navigate('SearchScreen', { uid: user.uid });
+          // this.props.navigation.navigate('ProfileScreen', { uid });
         } else {
           this.props.navigation.navigate('LoginScreen');
         }
