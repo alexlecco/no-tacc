@@ -41,7 +41,8 @@ class ProfileScreen extends Component {
     // console.log('usuario: ', this.state.user);
   }
 
-  componentDidMount() {
+  componentWillReceiveProps() {
+    // setTimeout(()=>this.getUserData(), 2000);
     this.getUserData();
   }
 

@@ -17,7 +17,7 @@ class SearchScreen extends Component {
     super(props);
     this.state = {
       searchText: '',
-      celiacStatus: {},
+      celiac_status: {},
       textInputStatus: 'untouched',
       food: false,
       item: true,
@@ -84,7 +84,7 @@ class SearchScreen extends Component {
     await this.userRef.once('value', snap => {
       snap.forEach(child => {
         if (child.key === uid)
-          this.setState({ celiacStatus: child.val().celiaquia3 });
+          this.state.celiac_status = child.val().celiac_status;
       });
     });
     // console.log('usuario: ', this.state.user);
@@ -97,7 +97,7 @@ class SearchScreen extends Component {
   async searchProduct() {
     // console.log('texto a buscar: ',this.state.searchText);
     // console.log('datos del usuario: ', this.state.celiacStatus);
-    const userCeliacStatus = this.state.celiacStatus;
+    const userCeliacStatus = this.state.celiac_status;
     const searchTxt = this.state.searchText;
     let products = [];
     await this.productsRef.once('value', snap => {
@@ -128,6 +128,11 @@ class SearchScreen extends Component {
   render() {
     return (
       <SafeAreaView style={styles.container}>
+        <View>
+          <TouchableOpacity style={styles.userButton}>
+            <Icon name='person'/>
+          </TouchableOpacity>
+        </View>
         <View style={styles.searchOptions}>
           <Text style={styles.title}>
             Ingrese el tipo de producto que desea
@@ -206,6 +211,10 @@ const styles = StyleSheet.create({
     width: 15,
     marginRight: 20,
     marginLeft: 5
+  },
+  userButton: {
+    borderColor: 'black',
+    
   },
   bar: {
     flexDirection: 'row',
