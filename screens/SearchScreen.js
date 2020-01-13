@@ -124,12 +124,18 @@ class SearchScreen extends Component {
       this.props.navigation.navigate('ProductsScreen', { products });
     });
   } //! END SEARCH PRODUCT METHOD
+  
+  goToProfile() {
+    const { navigation } = this.props;
+    const uid = navigation.getParam('uid');
+    this.props.navigation.navigate('ProfileScreen', { uid });
+  }
 
   render() {
     return (
       <SafeAreaView style={styles.container}>
-        <View>
-          <TouchableOpacity style={styles.userButton}>
+        <View style={styles.sectionTop}>
+          <TouchableOpacity style={styles.userButton} onPress={()=>this.goToProfile()}>
             <Icon name='person'/>
           </TouchableOpacity>
         </View>
@@ -212,9 +218,20 @@ const styles = StyleSheet.create({
     marginRight: 20,
     marginLeft: 5
   },
+  sectionTop:{
+    // backgroundColor: colors.secondaryColor,
+    padding: 20,
+    flexDirection: 'row-reverse',
+  },
   userButton: {
-    borderColor: 'black',
-    
+    borderColor: colors.primaryColor,
+    backgroundColor: colors.primaryColor,
+    borderWidth: 1.5,
+    borderRadius: 30,
+    width: 40,
+    height: 40,
+    alignItems: 'center',
+    justifyContent: 'center'
   },
   bar: {
     flexDirection: 'row',

@@ -98,11 +98,11 @@ class LoginScreen extends Component {
         this.onSignIn(result);
         // this.storeUser({ name: result.user.name });
         // console.log(this.state.isFirstTime);
-        if(true){
-          this.props.navigation.navigate('ProfileScreen', {uid: result.user.uid});
-        } else {
-          this.props.navigation.navigate('SearchScreen', {uid: result.user.uid});
-        } 
+        // if(true){
+        //   this.props.navigation.navigate('ProfileScreen', {uid: result.user.uid});
+        // } else {
+        //   this.props.navigation.navigate('SearchScreen', {uid: result.user.uid});
+        // } 
       } else {
         console.log('cancelled');
       }
