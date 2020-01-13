@@ -1,14 +1,12 @@
 import React, { Component } from 'react';
-import { View, Text, StyleSheet, Button } from 'react-native';
+import { View, Text, StyleSheet, Button, TouchableOpacity } from 'react-native';
 import * as Google from 'expo-google-app-auth';
 import { firebaseApp } from '../config/firebase';
+import Colors from '../constants/Colors';
 
 class LoginScreen extends Component {
   constructor(props) {
     super(props);
-    this.state = {
-      isFirstTime: false,
-    };
   }
   //SIGN IN FLOW f/ FIREBASE
   onSignIn = googleUser => {
@@ -41,7 +39,6 @@ class LoginScreen extends Component {
                     last_name: result.additionalUserInfo.profile.family_name,
                     celiac_status: false //MARSH 3 CELIAC LEVEL FALSE FOR DEFAULT
                   });
-                  
               } else {
                 // ---------- UPDATE DATA ---------
                 // firebaseApp
@@ -102,7 +99,7 @@ class LoginScreen extends Component {
         //   this.props.navigation.navigate('ProfileScreen', {uid: result.user.uid});
         // } else {
         //   this.props.navigation.navigate('SearchScreen', {uid: result.user.uid});
-        // } 
+        // }
       } else {
         console.log('cancelled');
       }
@@ -118,12 +115,18 @@ class LoginScreen extends Component {
   render() {
     return (
       <View style={styles.container}>
-        <Button
+        {/* <Button
             title='ingresá con Google'
             onPress={() => {
               this.googleSignIn();
             }}
-          />
+          /> */}
+        <TouchableOpacity
+          style={styles.button}
+          onPress={() => this.googleSignIn()}
+        >
+          <Text style={styles.buttonText}>Ingresá con Google</Text>
+        </TouchableOpacity>
       </View>
     );
   }
@@ -135,5 +138,19 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center'
+  },
+  button: {
+    borderWidth: 1,
+    backgroundColor: Colors.secondaryDarkColor,
+    borderColor: Colors.secondaryDarkColor,
+    width: '80%',
+    height: 50,
+    justifyContent: 'center'
+  },
+  buttonText: {
+    fontSize: 20,
+    textAlign: 'center',
+    fontWeight: '400',
+    color: 'white'
   }
 });
