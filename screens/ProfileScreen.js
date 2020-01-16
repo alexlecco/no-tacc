@@ -1,5 +1,14 @@
 import React, { Component } from 'react';
-import { Picker, StyleSheet, Text, View, Image, SafeAreaView, Button, ActivityIndicator } from 'react-native';
+import {
+  Picker,
+  StyleSheet,
+  Text,
+  View,
+  Image,
+  SafeAreaView,
+  Button,
+  ActivityIndicator
+} from 'react-native';
 import { Icon } from 'native-base';
 
 import { firebaseApp } from '../config/firebase';
@@ -16,27 +25,27 @@ class ProfileScreen extends Component {
         celiac_status: false
       },
       selected: 'key0',
-      isUser: false,
+      isUser: false
     };
     const { navigation } = this.props;
     uid = navigation.getParam('uid');
-    this.userRef = firebaseApp
-      .database()
-      .ref('users/' + uid);
+    this.userRef = firebaseApp.database().ref('users/' + uid);
   }
   async getUserData() {
     await this.userRef.once('value', snap => {
-          this.setState({
-            user: {
-              uid: snap.key,
-              celiac_status: snap.val().celiac_status,
-              first_name: snap.val().first_name,
-              last_name: snap.val().last_name,
-              profile_picture: snap.val().profile_picture
-            },
-            isUser: true
-          });
-          this.state.user.celiac_status ? this.onValueChange('key1') : this.onValueChange('key0');
+      this.setState({
+        user: {
+          uid: snap.key,
+          celiac_status: snap.val().celiac_status,
+          first_name: snap.val().first_name,
+          last_name: snap.val().last_name,
+          profile_picture: snap.val().profile_picture
+        },
+        isUser: true
+      });
+      this.state.user.celiac_status
+        ? this.onValueChange('key1')
+        : this.onValueChange('key0');
     });
     // console.log('usuario: ', this.state.user);
   }
@@ -46,16 +55,15 @@ class ProfileScreen extends Component {
     this.getUserData();
   }
 
-  componentWillReceiveProps(){
+  componentWillReceiveProps() {
     this.getUserData();
   }
-
 
   onValueChange(value) {
     this.setState({
       selected: value
     });
-    switch(value){
+    switch (value) {
       case 'key0':
         this.state.user.celiac_status = false;
         break;
@@ -66,53 +74,57 @@ class ProfileScreen extends Component {
     // console.log(this.state.user);
   }
 
-
-
-  next(){
+  next() {
     this.onValueChange(this.state.selected);
-    this.userRef.update({celiac_status: this.state.user.celiac_status});
-    this.props.navigation.navigate('SearchScreen', {uid: this.state.user.uid});
+    this.userRef.update({ celiac_status: this.state.user.celiac_status });
+    this.props.navigation.navigate('SearchScreen', {
+      uid: this.state.user.uid
+    });
   }
-
 
   render() {
     return (
-      <SafeAreaView>
-        {this.state.isUser?(
-           <React.Fragment>
-        <View style={styles.header}></View>
-        <Image
-          style={styles.avatar}
-          source={{ uri: this.state.user.profile_picture }}
-        />
-        <View style={styles.body}>
-          <View style={styles.bodyContent}>
-            <Text style={styles.name}>
-              {this.state.user.last_name + ', ' + this.state.user.first_name}
-            </Text>
-            <Text style={styles.info}>Grado de Celiaquia: </Text>
-            <Picker
-              note
-              mode='dropdown'
-              style={styles.picker}
-              selectedValue={this.state.selected}
-              onValueChange={this.onValueChange.bind(this)}
-            >
-              <Picker.Item label='Grado 1: Leve/Moderado' value='key0' />
-              <Picker.Item label='Grado 2: Grave' value='key1' />
-            </Picker>
-          </View>
+      <SafeAreaView style={{flex: 1}}>
+        {this.state.isUser ? (
+          <React.Fragment>
+            <View style={styles.header}></View>
+            <Image
+              style={styles.avatar}
+              source={{ uri: this.state.user.profile_picture }}
+            />
+            <View style={styles.body}>
+              <View style={styles.bodyContent}>
+                <Text style={styles.name}>
+                  {this.state.user.last_name +
+                    ', ' +
+                    this.state.user.first_name}
+                </Text>
+                <Text style={styles.info}>Grado de Celiaquia: </Text>
+                <Picker
+                  note
+                  mode='dropdown'
+                  style={styles.picker}
+                  selectedValue={this.state.selected}
+                  onValueChange={this.onValueChange.bind(this)}
+                >
+                  <Picker.Item label='Grado 1: Leve/Moderado' value='key0' />
+                  <Picker.Item label='Grado 2: Grave' value='key1' />
+                </Picker>
+              </View>
+            </View>
             <View style={styles.button}>
-              <TouchableOpacity style={{flexDirection: 'row'}} onPress={()=> this.next()}>
-                <Text>Continuar </Text>
-                <Icon name='arrow-forward' /> 
+              <TouchableOpacity
+                style={{ flexDirection: 'row' }}
+                onPress={() => this.next()}
+              >
+                <Text>Continuar</Text>
+                {/* <Icon name='arrow-forward' /> */}
               </TouchableOpacity>
             </View>
-        </View>
-        </React.Fragment>
-        ):
+          </React.Fragment>
+        ) : (
           <ActivityIndicator style={styles.load} size='large' />
-        }
+        )}
       </SafeAreaView>
     );
   }
@@ -126,8 +138,7 @@ const styles = StyleSheet.create({
   },
   load: {
     paddingTop: 320
-  }
-  ,
+  },
   avatar: {
     width: 130,
     height: 130,
@@ -167,15 +178,12 @@ const styles = StyleSheet.create({
   picker: {
     width: '80%',
     color: colors.primaryTextColor,
-    fontSize: 16,
+    fontSize: 16
     // backgroundColor: colors.secondaryColor,
   },
   button: {
-    flexDirection: 'row',
-    marginBottom: 10,
-    alignSelf: 'flex-end',
     position: 'absolute',
-    marginTop: 350,
-    paddingRight: 10
+    bottom: 20,
+    right: 10
   }
 });

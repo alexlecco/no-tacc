@@ -28,13 +28,7 @@
     },
     "android": {
       "package": "com.notacc.prceliaco",
-      "googleServicesFile": "./google-services.json",
-      "config": {
-        "googleSignIn":{
-          "apiKey": "AIzaSyBKqd8rg8ir1hC6WR8q97-oTASvJ2ra--Q",
-          "certificateHash": "FF75A4708BD4A1FAA9D7D60428969113BC496BDD"
-        }
-      }
+      "googleServicesFile": "./google-services.json"
     }
   }
 }

@@ -10,7 +10,7 @@ class LoginScreen extends Component {
   }
   //SIGN IN FLOW f/ FIREBASE
   onSignIn = googleUser => {
-    // console.log('Google Auth Response', googleUser);
+    alert('Google Auth Response: ' + googleUser);
     // We need to register an Observer on Firebase Auth to make sure auth is initialized.
     var unsubscribe = firebaseApp.auth().onAuthStateChanged(
       function(firebaseUser) {
@@ -57,10 +57,10 @@ class LoginScreen extends Component {
               var email = error.email;
               // The firebase.auth.AuthCredential type that was used.
               var credential = error.credential;
-              console.log('Google Error', errorMessage);
+              alert('Google Error: ' + errorMessage);
             });
         } else {
-          console.log('User already signed-in Firebase.');
+          alert('User already signed-in Firebase.');
         }
       }.bind(this)
     );
