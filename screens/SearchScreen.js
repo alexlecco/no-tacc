@@ -6,7 +6,8 @@ import {
   SafeAreaView,
   TouchableOpacity,
   Image,
-  TextInput
+  TextInput,
+  ImageBackground,
 } from 'react-native';
 import { Button, Icon } from 'native-base';
 import Colors from '../constants/Colors';
@@ -20,6 +21,7 @@ class SearchScreen extends Component {
       celiac_status: {},
       textInputStatus: 'untouched',
       food: false,
+      typeProduct: '',
       item: true,
       products: []
     };
@@ -95,13 +97,19 @@ class SearchScreen extends Component {
   }
 
   async searchProduct() {
-    // console.log('texto a buscar: ',this.state.searchText);
-    // console.log('datos del usuario: ', this.state.celiacStatus);
+    if(this.state.searchText == ''){
+      return;
+    }
     const userCeliacStatus = this.state.celiac_status;
     const searchTxt = this.state.searchText;
+    const type = this.state.typeProduct;
+
+    // console.log(type);
+
     let products = [];
     await this.productsRef.once('value', snap => {
-      snap.forEach(child => {
+      if(type == ''){
+        snap.forEach(child => {
         // console.log('marsh: ',child.val().marsh3Allowed);
         // console.log('celic status: ', userCeliacStatus);
         products.push({
@@ -116,12 +124,30 @@ class SearchScreen extends Component {
           products.pop(child);
         }
       });
-      //? FILTER PRODUCTS BY NAME
-      products = products.filter(product =>
-        product.name.toLowerCase().includes(searchTxt.toLowerCase())
-      );
-      // console.log('productos buscados: ',products);
-      this.props.navigation.navigate('ProductsScreen', { products });
+
+    } else {
+      snap.forEach(child => {
+        // console.log('marsh: ',child.val().marsh3Allowed);
+        // console.log('celic status: ', userCeliacStatus);
+        products.push({
+          id: child.val().id,
+          name: child.val().name,
+          brand: child.val().brand,
+          quantity: child.val().quantity,
+          marsh3Allowed: child.val().marsh3Allowed,
+          _key: child.key
+        });
+        if(userCeliacStatus && (child.val().marsh3Allowed != userCeliacStatus) || (type != child.val().type)){
+          products.pop(child);
+        }
+      });
+    }
+    //? OPTIMIZAR ESTO PLS
+    products = products.filter(product =>
+      product.name.toLowerCase().includes(searchTxt.toLowerCase())
+    );
+    // console.log('productos buscados: ',products);
+    this.props.navigation.navigate('ProductsScreen', { products });
     });
   } //! END SEARCH PRODUCT METHOD
   
@@ -130,6 +156,7 @@ class SearchScreen extends Component {
     const uid = navigation.getParam('uid');
     this.props.navigation.navigate('ProfileScreen', { uid });
   }
+  
 
   render() {
     return (
@@ -144,13 +171,15 @@ class SearchScreen extends Component {
             Ingrese el tipo de producto que desea
           </Text>
           <View style={styles.options}>
-            <TouchableOpacity style={styles.option} nextFocusDown='true'>
-              {/* <Icon name='logo-angular' /> */}
-              <Text style={styles.textOption}>Alimento</Text>
+            <TouchableOpacity onPress={()=>this.setState({typeProduct: 'prod'})} style={styles.option}>
+            <ImageBackground source={require('../assets/img/productos.jpg')} imageStyle={{ borderRadius: 20 }} style={styles.imageOption}>
+              <Text style={styles.textOption}>Productos</Text>
+            </ImageBackground>
             </TouchableOpacity>
-            <TouchableOpacity style={styles.option}>
-              {/* <Icon name='arrow-forward' /> */}
+            <TouchableOpacity onPress={()=>this.setState({typeProduct: 'meal'})} style={styles.option}>
+            <ImageBackground source={require('../assets/img/platos.jpg')} imageStyle={{ borderRadius: 20 }} style={styles.imageOption}>
               <Text style={styles.textOption}>Comidas</Text>
+            </ImageBackground>
             </TouchableOpacity>
           </View>
         </View>
@@ -186,14 +215,19 @@ const styles = StyleSheet.create({
     justifyContent: 'space-around'
   },
   option: {
-    height: 50,
-    width: '30%',
-    borderRadius: 5,
-    backgroundColor: Colors.secondaryColor,
-    paddingVertical: 10
+    height: '100%',
+    width: '45%',
+    borderRadius: 20,
+    // backgroundColor: Colors.secondaryColor,
+    paddingVertical: 20,
+  },
+  imageOption: {
+    width: '100%',
+    height: '100%',
   },
   textOption: {
-    textAlign: 'center'
+    textAlign: 'center',
+    fontSize: 22,
   },
   title: {
     padding: 20,

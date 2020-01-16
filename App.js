@@ -25,6 +25,7 @@ import { createAppContainer,createSwitchNavigator } from 'react-navigation';
 
 import LoadingScreen from './screens/LoadingScreen';
 import LoginScreen from './screens/LoginScreen';
+import LoginScreenNew from './screens/LoginScreenNew';
 import ProductsScreen from './screens/ProductsScreen';
 import ProfileScreen from './screens/ProfileScreen';
 import SearchScreen from './screens/SearchScreen';
@@ -35,6 +36,7 @@ import SearchScreen from './screens/SearchScreen';
 const AppSwitchNavigator = createSwitchNavigator({
   LoadingScreen:LoadingScreen, 
   LoginScreen:LoginScreen, 
+  LoginScreenNew:LoginScreenNew, 
   ProductsScreen:ProductsScreen, 
   ProfileScreen:ProfileScreen, 
   SearchScreen:SearchScreen, 

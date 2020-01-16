@@ -27,6 +27,7 @@ class ProductsScreen extends Component {
   }
 
 
+
   showOrHideProductByStores(product) {
     if (!this.state.ProductByStoresVisible) {
       this.setState({
@@ -49,6 +50,7 @@ class ProductsScreen extends Component {
 
 
   render() {
+    const {product} = this.state;
     return (
       <View style={styles.container}>
         {this.state.ProductByStoresVisible ? (

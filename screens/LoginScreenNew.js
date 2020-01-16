@@ -4,13 +4,55 @@ import * as Google from 'expo-google-app-auth';
 import { firebaseApp } from '../config/firebase';
 import Colors from '../constants/Colors';
 
+import { GoogleSignIn } from 'expo-google-sign-in';
+
+
 class LoginScreen extends Component {
-  constructor(props) {
-    super(props);
+  state = { user: null };
+
+  componentDidMount() {
+    this.initAsync();
   }
-  //SIGN IN FLOW f/ FIREBASE
+
+  initAsync = async () => {
+    await GoogleSignIn.initAsync();
+    this._syncUserWithStateAsync();
+  };
+
+  _syncUserWithStateAsync = async () => {
+    const user = await GoogleSignIn.signInSilentlyAsync();
+    this.onSignIn(user);
+    alert(user);
+    this.setState({ user });
+  };
+
+  signOutAsync = async () => {
+    await GoogleSignIn.signOutAsync();
+    this.setState({ user: null });
+  };
+
+  signInAsync = async () => {
+    try {
+      await GoogleSignIn.askForPlayServicesAsync();
+      const { type, user } = await GoogleSignIn.signInAsync();
+      if (type === 'success') {
+        this._syncUserWithStateAsync();
+      }
+    } catch ({ message }) {
+      alert('login: Error:' + message);
+    }
+  };
+
+  onPress = () => {
+    if (this.state.user) {
+      this.signOutAsync();
+    } else {
+      this.signInAsync();
+    }
+  };
+
   onSignIn = googleUser => {
-    console.log('Google Auth Response: ' + googleUser);
+    alert('Google Auth Response: ' + googleUser);
     // We need to register an Observer on Firebase Auth to make sure auth is initialized.
     var unsubscribe = firebaseApp.auth().onAuthStateChanged(
       function(firebaseUser) {
@@ -57,10 +99,10 @@ class LoginScreen extends Component {
               var email = error.email;
               // The firebase.auth.AuthCredential type that was used.
               var credential = error.credential;
-              console.log('Google Error: ' + errorMessage);
+              alert('Google Error: ' + errorMessage);
             });
         } else {
-          console.log('User already signed-in Firebase.');
+          alert('User already signed-in Firebase.');
         }
       }.bind(this)
     );
@@ -83,53 +125,12 @@ class LoginScreen extends Component {
     return false;
   };
 
-  async googleSignIn() {
-    try {
-      const result = await Google.logInAsync({
-        androidClientId:              '246004460762-jl6rcssbqu36s3l6vg28h5gd5u8pimbk.apps.googleusercontent.com',
-        androidStandaloneAppClientId: '34893812883-bkpmjbnd8alpr3voos79htji42kvpf25.apps.googleusercontent.com',
-        scopes: ['profile', 'email']
-      });
-
-      if (result.type === 'success') {
-        this.onSignIn(result);
-        // this.storeUser({ name: result.user.name });
-        // console.log(this.state.isFirstTime);
-        // if(true){
-        //   this.props.navigation.navigate('ProfileScreen', {uid: result.user.uid});
-        // } else {
-        //   this.props.navigation.navigate('SearchScreen', {uid: result.user.uid});
-        // }
-      } else {
-        console.log('cancelled');
-      }
-    } catch (e) {
-      console.log('error', e);
-    }
-  }
-  async googleSignOut() {
-    AsyncStorage.clear();
-    // this.setState({ signedIn: false, name: '' });
-  }
-
   render() {
-    return (
-      <View style={styles.container}>
-        {/* <Button
-            title='ingresá con Google'
-            onPress={() => {
-              this.googleSignIn();
-            }}
-          /> */}
-        <TouchableOpacity
-          style={styles.button}
-          onPress={() => this.googleSignIn()}
-        >
-          <Text style={styles.buttonText}>Ingresá con Google</Text>
-        </TouchableOpacity>
-      </View>
-    );
+    return <Text onPress={this.onPress}>Toggle Auth</Text>;
   }
+
+  
+  
 }
 export default LoginScreen;
 
