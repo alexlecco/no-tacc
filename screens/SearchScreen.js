@@ -228,6 +228,7 @@ const styles = StyleSheet.create({
   textOption: {
     textAlign: 'center',
     fontSize: 22,
+    paddingTop: 50
   },
   title: {
     padding: 20,
