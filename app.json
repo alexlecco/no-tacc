@@ -9,7 +9,7 @@
       "android",
       "web"
     ],
-    "version": "1.0.0",
+    "version": "1.0.2",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "splash": {
@@ -25,6 +25,16 @@
     ],
     "ios": {
       "supportsTablet": true
+    },
+    "android": {
+      "package": "com.notacc.prceliaco",
+      "googleServicesFile": "./google-services.json",
+      "config": {
+        "googleSignIn":{
+          "apiKey": "AIzaSyAMc4kbavMZEUFAf5mEqZFpXAxYtaw4HJc",
+          "certificateHash": "ff75a4708bd4a1faa9d7d60428969113bc496bdd"
+        }
+      }
     }
   }
 }

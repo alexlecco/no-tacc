@@ -1,0 +1,44 @@
+{
+  "project_info": {
+    "project_number": "34893812883",
+    "firebase_url": "https://prceliaco-1cfac.firebaseio.com",
+    "project_id": "prceliaco-1cfac",
+    "storage_bucket": "prceliaco-1cfac.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:34893812883:android:8bf3eb1636eba2ada32966",
+        "android_client_info": {
+          "package_name": "com.notacc.prceliaco"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "34893812883-bkpmjbnd8alpr3voos79htji42kvpf25.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.notacc.prceliaco",
+            "certificate_hash": "ff75a4708bd4a1faa9d7d60428969113bc496bdd"
+          }
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAMc4kbavMZEUFAf5mEqZFpXAxYtaw4HJc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "34893812883-g06kjup3d4t0638cohik251qdh8oip09.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

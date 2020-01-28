@@ -46,6 +46,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     marginTop: 10,
     marginHorizontal: 10,
+    minWidth: '90%',
     borderRadius: 5,
     backgroundColor: Colors.secondaryDarkColor,
   },
@@ -54,7 +55,6 @@ const styles = StyleSheet.create({
     width: 50,
     height: 'auto',
     flex: 0.3,
-
   },
   product: {
     flex: 0.7,
@@ -62,7 +62,7 @@ const styles = StyleSheet.create({
     paddingLeft: 15,
   },
   name: {
-    fontSize: 18,
+    fontSize: 16,
     textTransform: 'capitalize',
     textAlign: 'center'
   }

@@ -51,6 +51,8 @@ export default class StoreCard extends Component {
   render() {
     const { store } = this.state;
     const productByStores = this.props.productByStores.item;
+    console.log('store: ', store);
+    console.log('stores: ', productByStores);
     
     return (
       <View style={styles.card}>

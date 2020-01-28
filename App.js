@@ -21,20 +21,23 @@ import ProductByStores from './components/ProductByStores';
 import { firebaseApp } from './config/firebase';
 import * as Google from 'expo-google-app-auth';
 
-const LoginPage = props => {
-  return (
-    <View style={styles.loading}>
-      {
-        !props.getUser()
-        ?
-          <View />
-        :
-          <Button title="ingresá con Google"
-          onPress={() => props.googleSignIn()} />
-      }
-    </View>
-  )
-}
+import { createAppContainer, createSwitchNavigator } from 'react-navigation';
+
+import LoadingScreen from './screens/LoadingScreen';
+import LoginScreen from './screens/LoginScreen';
+import ProductsScreen from './screens/ProductsScreen';
+import ProfileScreen from './screens/ProfileScreen';
+import SearchScreen from './screens/SearchScreen';
+
+const AppSwitchNavigator = createSwitchNavigator({
+  LoadingScreen: LoadingScreen,
+  LoginScreen: LoginScreen,
+  ProductsScreen: ProductsScreen,
+  ProfileScreen: ProfileScreen,
+  SearchScreen: SearchScreen
+});
+
+const AppNavigator = createAppContainer(AppSwitchNavigator);
 
 export default class App extends Component {
   constructor(props) {
@@ -43,24 +46,20 @@ export default class App extends Component {
       products: [],
       ProductByStoresVisible: false,
       product: {},
-      searchText: '',
       allProducts: [],
-      textInputStatus: 'untouched',
-      activeApp: true,
-      signedIn: false,
-      name: '',
-      photoUrl: ''
+      activeApp: true
     };
 
-    this.productsRef = firebaseApp.database().ref().child('products');
-    this.activeAppRef = firebaseApp.database().ref().child('activeApp');
-    this.usersRef = firebaseApp.database().ref().child('users');
-    
+    this.productsRef = firebaseApp
+      .database()
+      .ref()
+      .child('products');
+    this.activeAppRef = firebaseApp
+      .database()
+      .ref()
+      .child('activeApp');
+
     showOrHideProductByStores = this.showOrHideProductByStores.bind(this);
-    googleSignOut = this.googleSignOut.bind(this);
-    clearText = this.clearText.bind(this);
-    googleSignIn = this.googleSignIn.bind(this);
-    getUser = this.getUser.bind(this);
 
     console.disableYellowBox = true;
     console.warn('YellowBox is disabled.');
@@ -71,31 +70,6 @@ export default class App extends Component {
   componentWillMount() {
     this.listenForProducts(this.productsRef);
     this.listenForActiveApp(this.activeAppRef);
-    this.getUser();
-  }
-
-  async storeUser(user) {
-    try {
-       await AsyncStorage.setItem("user", JSON.stringify(user));
-       
-    } catch (error) {
-      console.log("Something went wrong", error);
-    }
-  }
-
-  async getUser() {
-    try {
-      let userData = await AsyncStorage.getItem("user");
-      let data = JSON.parse(userData);
-      if(data !== null) {
-        this.setState({signedIn: true, name: data.name})
-        return true;
-      } else {
-        return false;
-      }
-    } catch (error) {
-      console.log("Something went wrong", error);
-    }
   }
 
   showOrHideProductByStores(product) {
@@ -132,16 +106,6 @@ export default class App extends Component {
         });
       });
 
-      // HARDCODED USER..PLEASE DELETE
-      let hipoteticUser = { celiaquia3: true };
-
-      // POP PRODUCTS W CELIAC IMCOMPATIBLE WITH THE USER
-      for(product in products){
-        if(hipoteticUser.celiaquia3 != product.marsh3Allowed){
-          products.pop(product);
-        }
-      }
-
       this.setState({
         allProducts: products,
         products: products
@@ -156,128 +120,21 @@ export default class App extends Component {
     });
   }
 
-  filterSearch(text) {
-   
-    let filteredProducts = this.state.allProducts.filter(product => 
-      product.name.toLowerCase().includes(text.toLowerCase())
-    );
-
-    this.setState({
-      products: filteredProducts,
-      searchText: text,
-      textInputStatus: 'touched'
-    });
-  }
-
-  clearText() {
-    this.setState({
-      textInputStatus: 'untouched',
-      searchText: ''
-    });
-
-    this.restartSearch()
-  }
-
-  restartSearch() {
-    this.listenForProducts(this.productsRef);
-    this.setState({ProductByStoresVisible: false})
-  }
-
-  renderClearButton() {
-    if (this.state.textInputStatus == 'touched') {
-      return (
-        <TouchableOpacity onPress={() => this.clearText()}>
-          <Image
-            style={styles.button}
-            source={require('./assets/img/clear-input.png')}
-          />
-        </TouchableOpacity>
-      );
-    } else {
-      return <View/ >;
-    }
-  }
-
-  
-
-
-
-
-
-  async googleSignIn() {
-    try {
-      const result = await Google.logInAsync({
-        androidClientId: "246004460762-6ac3ug1la8sill81a2j03vkl1oo1rhgu.apps.googleusercontent.com",
-        scopes: ["profile", "email"]
-      })
-
-      if (result.type === "success") {
-        this.setState({
-          signedIn: true,
-          name: result.user.name,
-          photoUrl: result.user.photoUrl
-        })
-        this.storeUser({name: result.user.name})
-      } else {
-        console.log("cancelled")
-      }
-
-    } catch (e) {
-      console.log("error", e)
-    }
-  }
-
-  async googleSignOut() {
-    AsyncStorage.clear();
-    this.setState({signedIn: false, name: ''})
-  }
-
   render() {
-    const { products, product, signedIn } = this.state;
-    console.log("state::::::", this.state)
-
     return (
       <SafeAreaView style={styles.container}>
         {Platform.OS === 'ios' && <StatusBar barStyle='default' />}
         {Platform.OS === 'android' && <View style={styles.statusBarUnderlay} />}
 
-        {
-          this.state.activeApp
-          ?
-            signedIn
-            ?
-              <React.Fragment>
-                <View style={styles.searchSection}>
-                  <TextInput
-                    style={styles.textInput}
-                    onChangeText={text => this.filterSearch(text)}
-                    value={this.state.searchText}
-                    placeholder='Buscar producto'
-                  />
-                  {this.renderClearButton()}
-                </View>
-
-                {this.state.ProductByStoresVisible ? (
-                  <ProductByStores
-                    product={product}
-                    showOrHideProductByStores={this.showOrHideProductByStores.bind(this)}
-                  />
-                ) : (
-                  <ProductSearchResults
-                    userName={this.state.name}
-                    products={products}
-                    showOrHideProductByStores={this.showOrHideProductByStores.bind(this)}
-                    googleSignOut={this.googleSignOut.bind(this)}
-                  />
-                )}
-              </React.Fragment>
-            :
-              <LoginPage getUser={this.getUser.bind(this)} googleSignIn={this.googleSignIn.bind(this)} />
-          :
-            <View style={styles.activeApp}><Text style={styles.title}>Aplicación no activa</Text></View>
-        }
-              
-        
+        {this.state.activeApp ? (
+          <React.Fragment>
+            <AppNavigator />
+          </React.Fragment>
+        ) : (
+          <View style={styles.activeApp}>
+            <Text style={styles.title}>Aplicación no activa</Text>
+          </View>
+        )}
       </SafeAreaView>
     );
   }
@@ -317,10 +174,10 @@ const styles = StyleSheet.create({
   activeApp: {
     flex: 1,
     alignItems: 'center',
-    justifyContent: 'center',
+    justifyContent: 'center'
   },
   title: {
-      color: colors.white,
+    color: colors.white
   },
   header: {
     fontSize: 25
@@ -330,5 +187,5 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'flex-end',
     marginBottom: 40
-  },
+  }
 });
