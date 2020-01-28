@@ -21,25 +21,20 @@ import ProductByStores from './components/ProductByStores';
 import { firebaseApp } from './config/firebase';
 import * as Google from 'expo-google-app-auth';
 
-import { createAppContainer,createSwitchNavigator } from 'react-navigation';
+import { createAppContainer, createSwitchNavigator } from 'react-navigation';
 
 import LoadingScreen from './screens/LoadingScreen';
 import LoginScreen from './screens/LoginScreen';
-import LoginScreenNew from './screens/LoginScreenNew';
 import ProductsScreen from './screens/ProductsScreen';
 import ProfileScreen from './screens/ProfileScreen';
 import SearchScreen from './screens/SearchScreen';
 
-
-
-
 const AppSwitchNavigator = createSwitchNavigator({
-  LoadingScreen:LoadingScreen, 
-  LoginScreen:LoginScreen, 
-  LoginScreenNew:LoginScreenNew, 
-  ProductsScreen:ProductsScreen, 
-  ProfileScreen:ProfileScreen, 
-  SearchScreen:SearchScreen, 
+  LoadingScreen: LoadingScreen,
+  LoginScreen: LoginScreen,
+  ProductsScreen: ProductsScreen,
+  ProfileScreen: ProfileScreen,
+  SearchScreen: SearchScreen
 });
 
 const AppNavigator = createAppContainer(AppSwitchNavigator);
@@ -52,7 +47,7 @@ export default class App extends Component {
       ProductByStoresVisible: false,
       product: {},
       allProducts: [],
-      activeApp: true,
+      activeApp: true
     };
 
     this.productsRef = firebaseApp
@@ -64,9 +59,7 @@ export default class App extends Component {
       .ref()
       .child('activeApp');
 
-
     showOrHideProductByStores = this.showOrHideProductByStores.bind(this);
-
 
     console.disableYellowBox = true;
     console.warn('YellowBox is disabled.');
@@ -78,8 +71,6 @@ export default class App extends Component {
     this.listenForProducts(this.productsRef);
     this.listenForActiveApp(this.activeAppRef);
   }
-
- 
 
   showOrHideProductByStores(product) {
     if (!this.state.ProductByStoresVisible) {
@@ -115,7 +106,6 @@ export default class App extends Component {
         });
       });
 
-
       this.setState({
         allProducts: products,
         products: products
@@ -130,22 +120,17 @@ export default class App extends Component {
     });
   }
 
-  
-
   render() {
-    const { products, product, signedIn } = this.state;
-    // console.log("state::::::", this.state)
-
     return (
       <SafeAreaView style={styles.container}>
         {Platform.OS === 'ios' && <StatusBar barStyle='default' />}
         {Platform.OS === 'android' && <View style={styles.statusBarUnderlay} />}
 
-        {this.state.activeApp ?  (
-            <React.Fragment>
-              <AppNavigator/>
-            </React.Fragment>
-          ) : (
+        {this.state.activeApp ? (
+          <React.Fragment>
+            <AppNavigator />
+          </React.Fragment>
+        ) : (
           <View style={styles.activeApp}>
             <Text style={styles.title}>Aplicación no activa</Text>
           </View>
