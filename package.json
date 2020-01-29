@@ -12,6 +12,7 @@
     "expo-font": "~7.0.0",
     "expo-google-app-auth": "^8.0.0",
     "firebase": "^7.5.0",
+    "geolib": "^3.2.1",
     "native-base": "^2.13.8",
     "react": "16.8.3",
     "react-dom": "16.8.3",

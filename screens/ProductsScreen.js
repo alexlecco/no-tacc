@@ -4,17 +4,47 @@ import { View, Text, StyleSheet } from 'react-native';
 import ProductSearchResults from '../components/ProductSearchResults';
 import ProductByStores from '../components/ProductByStores';
 
+import { firebaseApp } from "../config/firebase";
+
 class ProductsScreen extends Component {
   constructor(props) {
     super(props);
     this.state = {
       products: [],
+      stores: [],
       product: {},
       ProductByStoresVisible: false,
     };
 
     showOrHideProductByStores = this.showOrHideProductByStores.bind(this);
+    this.storesRef = firebaseApp.database().ref().child("stores");
+  }
 
+  componentWillMount() {
+    this.cloneData(this.storesRef)
+  }
+
+  cloneData(storesRef) {
+    storesRef.on("value", snap => {
+      let stores = [];
+      snap.forEach(child => {
+        stores.push({
+          id: child.val().id,
+          address: child.val().address,
+          name: child.val().name,
+          distance: child.val().distance,
+          location: {
+            latitude: child.val().location.latitude,
+            longitude: child.val().location.longitude
+          },
+          _key: child.key
+        });
+      });
+
+      console.log("CLONE():::::", stores)
+
+      this.setState({ stores: stores });
+    });
   }
 
   getProducts() {
@@ -25,8 +55,6 @@ class ProductsScreen extends Component {
     // console.log('productos enviados de search: ', products);
     // console.log('productos: ', this.state.products);
   }
-
-
 
   showOrHideProductByStores(product) {
     if (!this.state.ProductByStoresVisible) {
@@ -50,15 +78,14 @@ class ProductsScreen extends Component {
 
 
   render() {
-    const {product} = this.state;
+    const {product, stores} = this.state;
     return (
       <View style={styles.container}>
         {this.state.ProductByStoresVisible ? (
           <ProductByStores
             product={product}
-            showOrHideProductByStores={this.showOrHideProductByStores.bind(
-              this
-            )}
+            stores={stores}
+            showOrHideProductByStores={this.showOrHideProductByStores.bind(this)}
           />
         ) : (
           <ProductSearchResults

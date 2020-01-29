@@ -87,7 +87,7 @@ export default class App extends Component {
     try {
       await AsyncStorage.setItem('user', JSON.stringify(user));
     } catch (error) {
-      console.log('Something went wrong', error);
+      //console.log('Something went wrong', error);
     }
   }
 
@@ -102,7 +102,7 @@ export default class App extends Component {
         return false;
       }
     } catch (error) {
-      console.log('Something went wrong', error);
+      //console.log('Something went wrong', error);
     }
   }
 

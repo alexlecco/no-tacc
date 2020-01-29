@@ -5,6 +5,7 @@ import StoreCard from './StoreCard';
 import { firebaseApp } from "../config/firebase";
 
 import {Footer, Spinner} from 'native-base';
+import { getDistance } from 'geolib';
 
 export default class ProductByStores extends Component {
   constructor(props) {
@@ -12,6 +13,8 @@ export default class ProductByStores extends Component {
     this.state = {
       productByStores: [],
       loading: true,
+      mainPoint: {latitude: -26.8283728, longitude: -65.2224645},
+      orderedStores: []
     };
 
     this.productByStoresRef = firebaseApp.database().ref().child("products-stores");
@@ -19,6 +22,7 @@ export default class ProductByStores extends Component {
 
   componentWillMount() {
     this.listenForproductByStores(this.productByStoresRef);
+    this.calculate()
   }
 
   listenForproductByStores(productByStoresRef) {
@@ -45,13 +49,39 @@ export default class ProductByStores extends Component {
     });
   }
 
+  calculate() {
+    const { mainPoint } = this.state;
+    const { stores } = this.props;
+    console.log("this.props.stores", this.props.stores)
+
+    const updatedList = stores.map((point) => {
+      return({
+        id: point.id,
+        address: point.address,
+        name: point.name,
+        distance: getDistance(mainPoint, point.location),
+        location: {
+          latitude: point.location.latitude,
+          longitude: point.location.longitude
+        },
+        _key: point.name
+      })
+    });
+
+    updatedList.sort((a, b) => (a.distance > b.distance) ? 1 : -1)
+
+    this.setState({ orderedStores: updatedList });
+    console.log("updatedList", updatedList)
+  }
+
   getProductPhoto(id) {
     return `https://firebasestorage.googleapis.com/v0/b/prceliaco-1cfac.appspot.com/o/products%2F${id}.png?alt=media`;
   }
 
   render() {
     const { product } = this.props;
-    const { productByStores, stores } = this.state;
+    const { productByStores, orderedStores } = this.state;
+    console.log("stores ordenados:::::", orderedStores)
 
     return (
       this.state.loading ?
@@ -67,7 +97,13 @@ export default class ProductByStores extends Component {
             <FlatList
                 style={styles.flatList}
                 data={productByStores}
-                renderItem={productByStores => <StoreCard productByStores={productByStores} product={product} />}
+                renderItem={productByStores =>
+                              <StoreCard
+                                productByStores={productByStores}
+                                product={product}
+                                orderedStores={orderedStores} // importante pasar a StoreCard
+                              />
+                            }
                 keyExtractor={(product, index) => { return product.id.toString() }}
             />
           <Button
