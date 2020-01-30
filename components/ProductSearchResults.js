@@ -8,7 +8,7 @@ import { Spinner } from 'native-base';
 export default class ProductSearchResults extends Component {
   render() {
     const { products, showOrHideProductByStores } = this.props;
-    //console.log('productos en result:', this.props.products);        
+
     return(
       products.length === 0 ?
         <View style={styles.loading}><Text style={styles.title}> Cargando </Text><Spinner></Spinner></View>

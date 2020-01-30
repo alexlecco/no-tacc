@@ -41,7 +41,7 @@ export default class ProductByStores extends Component {
           });
         }
       });
-
+      
       this.setState({
         productByStores: productByStores,
         loading: false
@@ -52,7 +52,6 @@ export default class ProductByStores extends Component {
   calculate() {
     const { mainPoint } = this.state;
     const { stores } = this.props;
-    console.log("this.props.stores", this.props.stores)
 
     const updatedList = stores.map((point) => {
       return({
@@ -67,11 +66,30 @@ export default class ProductByStores extends Component {
         _key: point.name
       })
     });
-
+    
     updatedList.sort((a, b) => (a.distance > b.distance) ? 1 : -1)
-
+        
     this.setState({ orderedStores: updatedList });
-    console.log("updatedList", updatedList)
+  }
+
+  reorderProducts() {
+    let { orderedStores, productByStores } = this.state;
+    let reorderedProducts = []
+
+    orderedStores.forEach(store => {
+      let found = false;
+      
+      productByStores.filter(product => {
+        if(!found && product.store == store.id) {
+          reorderedProducts.push(product)
+          found = true
+        } else {
+          found = false
+        }
+      })
+    });
+
+    return reorderedProducts;
   }
 
   getProductPhoto(id) {
@@ -81,7 +99,7 @@ export default class ProductByStores extends Component {
   render() {
     const { product } = this.props;
     const { productByStores, orderedStores } = this.state;
-    console.log("stores ordenados:::::", orderedStores)
+    const reorderedProducts = this.reorderProducts();
 
     return (
       this.state.loading ?
@@ -96,12 +114,12 @@ export default class ProductByStores extends Component {
             <Text style={styles.title}> {product.name} </Text>
             <FlatList
                 style={styles.flatList}
-                data={productByStores}
+                data={reorderedProducts}
                 renderItem={productByStores =>
                               <StoreCard
                                 productByStores={productByStores}
                                 product={product}
-                                orderedStores={orderedStores} // importante pasar a StoreCard
+                                orderedStores={orderedStores}
                               />
                             }
                 keyExtractor={(product, index) => { return product.id.toString() }}

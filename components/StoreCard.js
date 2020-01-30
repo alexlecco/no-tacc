@@ -42,8 +42,6 @@ export default class StoreCard extends Component {
 
       const store = stores.find(item => item.id === productByStores.store)
 
-      //console.log("stores:::::", stores)
-
       this.setState({
         stores: stores,
         store: store,
@@ -59,8 +57,6 @@ export default class StoreCard extends Component {
     const { orderedStores } = this.props;
     const productByStores = this.props.productByStores.item;
     const store = orderedStores.find(store => store.id === productByStores.store)
-    //console.log('store:::::: ', store);
-    //console.log('productByStores:::::: ', productByStores);
     
     return (
       <View style={styles.card}>
@@ -68,10 +64,10 @@ export default class StoreCard extends Component {
         <View style={styles.store}>
           <Text style={styles.name}> {store.name} </Text>
           <Text style={styles.address}>
-            Dirección: {store.address}
+            Distancia: {store.distance} m
           </Text>
           <Text style={styles.address}>
-            Distancia: {store.distance} m
+            Dirección: {store.address}
           </Text>
           <Text style={styles.address}>
             Precio: ${ productByStores.price }

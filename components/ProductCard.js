@@ -1,9 +1,7 @@
 import React, { Component } from 'react';
 import { View, Text, StyleSheet, Image, TouchableWithoutFeedback} from 'react-native';
 
-import {  Header, Content, Card, CardItem, Body } from "native-base";
 import Colors from '../constants/Colors';
-
 
 export default class ProductCard extends Component {
   constructor(props) {

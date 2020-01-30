@@ -41,8 +41,6 @@ class ProductsScreen extends Component {
         });
       });
 
-      console.log("CLONE():::::", stores)
-
       this.setState({ stores: stores });
     });
   }
@@ -52,8 +50,6 @@ class ProductsScreen extends Component {
     const products = navigation.getParam('products');
     this.state.products = products;
     return this.state.products;
-    // console.log('productos enviados de search: ', products);
-    // console.log('productos: ', this.state.products);
   }
 
   showOrHideProductByStores(product) {

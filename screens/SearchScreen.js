@@ -89,7 +89,6 @@ class SearchScreen extends Component {
           this.state.celiac_status = child.val().celiac_status;
       });
     });
-    // console.log('usuario: ', this.state.user);
   }
 
   componentDidMount() {
@@ -104,50 +103,44 @@ class SearchScreen extends Component {
     const searchTxt = this.state.searchText;
     const type = this.state.typeProduct;
 
-    // console.log(type);
 
     let products = [];
     await this.productsRef.once('value', snap => {
       if(type == ''){
         snap.forEach(child => {
-        // console.log('marsh: ',child.val().marsh3Allowed);
-        // console.log('celic status: ', userCeliacStatus);
-        products.push({
-          id: child.val().id,
-          name: child.val().name,
-          brand: child.val().brand,
-          quantity: child.val().quantity,
-          marsh3Allowed: child.val().marsh3Allowed,
-          _key: child.key
+          products.push({
+            id: child.val().id,
+            name: child.val().name,
+            brand: child.val().brand,
+            quantity: child.val().quantity,
+            marsh3Allowed: child.val().marsh3Allowed,
+            _key: child.key
+          });
+          
+          if(userCeliacStatus && (child.val().marsh3Allowed != userCeliacStatus)){
+            products.pop(child);
+          }
         });
-        if(userCeliacStatus && (child.val().marsh3Allowed != userCeliacStatus)){
-          products.pop(child);
-        }
-      });
-
-    } else {
-      snap.forEach(child => {
-        // console.log('marsh: ',child.val().marsh3Allowed);
-        // console.log('celic status: ', userCeliacStatus);
-        products.push({
-          id: child.val().id,
-          name: child.val().name,
-          brand: child.val().brand,
-          quantity: child.val().quantity,
-          marsh3Allowed: child.val().marsh3Allowed,
-          _key: child.key
+      } else {
+        snap.forEach(child => {
+          products.push({
+            id: child.val().id,
+            name: child.val().name,
+            brand: child.val().brand,
+            quantity: child.val().quantity,
+            marsh3Allowed: child.val().marsh3Allowed,
+            _key: child.key
+          });
+          if(userCeliacStatus && (child.val().marsh3Allowed != userCeliacStatus) || (type != child.val().type)){
+            products.pop(child);
+          }
         });
-        if(userCeliacStatus && (child.val().marsh3Allowed != userCeliacStatus) || (type != child.val().type)){
-          products.pop(child);
-        }
-      });
-    }
-    //? OPTIMIZAR ESTO PLS
-    products = products.filter(product =>
-      product.name.toLowerCase().includes(searchTxt.toLowerCase())
-    );
-    // console.log('productos buscados: ',products);
-    this.props.navigation.navigate('ProductsScreen', { products });
+      }
+      //? OPTIMIZAR ESTO PLS
+      products = products.filter(product =>
+        product.name.toLowerCase().includes(searchTxt.toLowerCase())
+      );
+      this.props.navigation.navigate('ProductsScreen', { products });
     });
   } //! END SEARCH PRODUCT METHOD
   
