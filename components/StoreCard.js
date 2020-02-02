@@ -70,7 +70,7 @@ export default class StoreCard extends Component {
             Dirección: {store.address}
           </Text>
           <Text style={styles.address}>
-            Precio: ${ productByStores.price }
+            Precio en este local: ${ productByStores.price }
           </Text>
         </View>
       </View>

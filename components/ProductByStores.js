@@ -1,11 +1,13 @@
 import React, { Component } from "react";
-import { View, Text, StyleSheet, Button, Image, Dimensions, FlatList, } from "react-native";
+import { View, Text, StyleSheet, Button, Image, Dimensions, FlatList, Platform } from "react-native";
+
+import Constants from 'expo-constants';
+import * as Location from 'expo-location';
+import * as Permissions from 'expo-permissions';
+import { getDistance } from 'geolib';
 
 import StoreCard from './StoreCard';
 import { firebaseApp } from "../config/firebase";
-
-import {Footer, Spinner} from 'native-base';
-import { getDistance } from 'geolib';
 
 export default class ProductByStores extends Component {
   constructor(props) {
@@ -13,7 +15,8 @@ export default class ProductByStores extends Component {
     this.state = {
       productByStores: [],
       loading: true,
-      mainPoint: {latitude: -26.8283728, longitude: -65.2224645},
+      location: null,
+      errorMessage: null,
       orderedStores: []
     };
 
@@ -21,9 +24,57 @@ export default class ProductByStores extends Component {
   }
 
   componentWillMount() {
+    this.verifyDevice();  
     this.listenForproductByStores(this.productByStoresRef);
-    this.calculate()
   }
+  
+  verifyDevice() {
+    if (Platform.OS === 'android' && !Constants.isDevice) {
+      this.setState({
+        errorMessage: 'Esta funcionalidad no está disponible',
+      });
+    } else {
+      this._getLocationAsync();
+    }
+  }
+
+  _getLocationAsync = async () => {
+    let { status } = await Permissions.askAsync(Permissions.LOCATION);
+    if (status !== 'granted') {
+      this.setState({
+        errorMessage: 'Permiso denegado para acceder a la geolocalización',
+      });
+    }
+
+    let location = await Location.getCurrentPositionAsync({});
+    this.setState({ location: location });
+    const { stores } = this.props;
+
+    const localPoint = {
+      location: {
+        latitude: location.coords.latitude,
+        longitude: location.coords.longitude
+      }
+    }
+
+    const updatedList = stores.map((point) => {
+      return({
+        id: point.id,
+        address: point.address,
+        name: point.name,
+        distance: getDistance(localPoint.location, point.location),
+        location: {
+          latitude: point.location.latitude,
+          longitude: point.location.longitude
+        },
+        _key: point.name
+      })
+    });
+    
+    updatedList.sort((a, b) => (a.distance > b.distance) ? 1 : -1)
+        
+    this.setState({ orderedStores: updatedList });
+  };
 
   listenForproductByStores(productByStoresRef) {
     const productID = this.props.product.id;
@@ -47,29 +98,6 @@ export default class ProductByStores extends Component {
         loading: false
       });
     });
-  }
-
-  calculate() {
-    const { mainPoint } = this.state;
-    const { stores } = this.props;
-
-    const updatedList = stores.map((point) => {
-      return({
-        id: point.id,
-        address: point.address,
-        name: point.name,
-        distance: getDistance(mainPoint, point.location),
-        location: {
-          latitude: point.location.latitude,
-          longitude: point.location.longitude
-        },
-        _key: point.name
-      })
-    });
-    
-    updatedList.sort((a, b) => (a.distance > b.distance) ? 1 : -1)
-        
-    this.setState({ orderedStores: updatedList });
   }
 
   reorderProducts() {
@@ -96,10 +124,22 @@ export default class ProductByStores extends Component {
     return `https://firebasestorage.googleapis.com/v0/b/prceliaco-1cfac.appspot.com/o/products%2F${id}.png?alt=media`;
   }
 
+  setDistanceText() {
+    let text = 'Calculando distancia';
+    if (this.state.errorMessage) {
+      text = this.state.errorMessage;
+    } else if (this.state.location) {
+      text = JSON.stringify(this.state.location);
+    }
+
+    return text === 'Calculando distancia' ? text : ''
+  }
+
   render() {
     const { product } = this.props;
-    const { productByStores, orderedStores } = this.state;
+    const { orderedStores } = this.state;
     const reorderedProducts = this.reorderProducts();
+    const distanceText = this.setDistanceText(); 
 
     return (
       this.state.loading ?
@@ -112,6 +152,7 @@ export default class ProductByStores extends Component {
               style={styles.coverImage}
             />
             <Text style={styles.title}> {product.name} </Text>
+            <Text>{distanceText}</Text>
             <FlatList
                 style={styles.flatList}
                 data={reorderedProducts}
