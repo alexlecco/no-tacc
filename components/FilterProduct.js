@@ -7,43 +7,31 @@ class FilterProduct extends Component {
     super(props);
 
     this.state = {
-      elements: []
+      activeOption: this.props.list[-1],
     };
   }
 
-  // press(index){
-  //   this.props.addFilterOption(index);
-  //   this.setState({
-  //     options: this.state.options.push(index),
-  //     pressStatus: !this.state.pressStatus,
-  //   });
+  
 
-  // }
-
-  press(index) {
-    if (!this.state.elements.includes(index))
-      this.state.elements.push(index);
-    else{
-      this.state.elements.splice(this.state.elements.indexOf(index), 1)
-    };
-    console.log('elementos:', this.state.elements);
-  }
-
-  isPress(index) {
-    if(this.state.elements.includes(index)) {
-      console.log(this.state.elements.includes(index));  
-      return true;
+  updateActiveOption = (activeOption) => {
+    if(activeOption === this.state.activeOption) this.state.activeOption = '';
+    else {
+      this.setState({
+        activeOption,
+      });
     }
-    else return false;
-  }
+  };
 
   render() {
     const elements = this.props.list;
     const buttons = elements.map((item, index) => (
       <TouchableOpacity
         key={item}
-        onPress={() => this.press(index)}
-        style={this.isPress(index) ? styles.buttonPressed : styles.button}
+        onPress={() => {
+          this.props.addFilterOption(index);
+          this.updateActiveOption(item);
+        }}
+        style={this.state.activeOption === item ? styles.buttonPressed : styles.button}
       >
         <Text style={styles.btnText}>{item}</Text>
       </TouchableOpacity>

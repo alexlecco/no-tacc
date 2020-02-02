@@ -15,17 +15,12 @@ import Colors from '../constants/Colors';
 import { firebaseApp } from '../config/firebase';
 import FilterProduct from '../components/FilterProduct';
 
-const platos = [
-  'Desayuno', 
-  'Almuerzo', 
-  'Merienda', 
-  'Cena'
-];
+const platos = ['Desayuno', 'Almuerzo', 'Merienda', 'Cena'];
 const productos = [
-  'Panificados', 
-  'Bebidas', 
-  'Chocolates', 
-  'Cereales', 
+  'Panificados',
+  'Bebidas',
+  'Chocolates',
+  'Cereales',
   'Harinas'
 ];
 
@@ -43,7 +38,7 @@ class SearchScreen extends Component {
       filtersActive: false,
       pressStatus: 0,
       list: [],
-      filterOptions: []
+      filterOption: -1
     };
     this.userRef = firebaseApp
       .database()
@@ -124,6 +119,7 @@ class SearchScreen extends Component {
     const userCeliacStatus = this.state.celiac_status;
     const searchTxt = this.state.searchText;
     const type = this.state.typeProduct;
+    const filterOption = this.state.filterOption;
 
     let products = [];
     await this.productsRef.once('value', snap => {
@@ -161,7 +157,7 @@ class SearchScreen extends Component {
           if (
             (userCeliacStatus &&
               child.val().marsh3Allowed != userCeliacStatus) ||
-            type != child.val().type
+            (type != child.val().type && child.val().category != filterOption)
           ) {
             products.pop(child);
           }
@@ -186,7 +182,7 @@ class SearchScreen extends Component {
     this.setState({
       pressStatus: 0,
       filtersActive: false,
-      filterOptions: []
+      filterOption: -1
     });
   }
 
@@ -199,7 +195,7 @@ class SearchScreen extends Component {
       typeProduct: text,
       pressStatus: id,
       filtersActive: true,
-      filterOptions: []
+      filterOption: -1
     });
     if (text === 'prod') {
       this.state.list = productos;
@@ -209,10 +205,9 @@ class SearchScreen extends Component {
   }
 
   addFilterOption(option) {
-    if (this.state.filterOptions.find(opt => opt == option) === undefined)
-      this.state.filterOptions.push(option);
-    else return;
-    console.log('opciones de filtro seleccionadas: ', this.state.filterOptions);
+    this.setState({
+      filterOption: option
+    });
   }
 
   render() {
