@@ -8,9 +8,10 @@ import {
   TouchableHighlight,
   Image,
   TextInput,
-  ImageBackground
+  ImageBackground,
+  KeyboardAvoidingView
 } from 'react-native';
-import { Button, Icon } from 'native-base';
+import { Icon } from 'native-base';
 import Colors from '../constants/Colors';
 import { firebaseApp } from '../config/firebase';
 import FilterProduct from '../components/FilterProduct';
@@ -83,7 +84,7 @@ class SearchScreen extends Component {
 
   renderSearchBar() {
     return (
-      <View style={styles.bar}>
+      <KeyboardAvoidingView style={styles.bar} behavior="padding" enabled>
         <TextInput
           style={styles.textInput}
           onChangeText={text => this.viewClearButton(text)}
@@ -92,7 +93,7 @@ class SearchScreen extends Component {
           placeholder="Buscar producto"
         />
         {this.renderClearButton()}
-      </View>
+      </KeyboardAvoidingView>
     );
   }
 
@@ -120,13 +121,10 @@ class SearchScreen extends Component {
     const searchTxt = this.state.searchText;
     const type = this.state.typeProduct;
     const filterOption = this.state.filterOption;
-
     let products = [];
     await this.productsRef.once('value', snap => {
       if (type == '') {
         snap.forEach(child => {
-          // console.log('marsh: ',child.val().marsh3Allowed);
-          // console.log('celic status: ', userCeliacStatus);
           products.push({
             id: child.val().id,
             name: child.val().name,
@@ -139,13 +137,11 @@ class SearchScreen extends Component {
             userCeliacStatus &&
             child.val().marsh3Allowed != userCeliacStatus
           ) {
-            products.pop(child);
+            products.splice(products.indexOf(child), 1);
           }
         });
       } else {
         snap.forEach(child => {
-          // console.log('marsh: ',child.val().marsh3Allowed);
-          // console.log('celic status: ', userCeliacStatus);
           products.push({
             id: child.val().id,
             name: child.val().name,
@@ -159,7 +155,7 @@ class SearchScreen extends Component {
               child.val().marsh3Allowed != userCeliacStatus) ||
             (type != child.val().type && child.val().category != filterOption)
           ) {
-            products.pop(child);
+            products.splice(products.indexOf(child), 1);
           }
         });
       }
@@ -172,6 +168,7 @@ class SearchScreen extends Component {
     });
   } //! END SEARCH PRODUCT METHOD
 
+
   goToProfile() {
     const { navigation } = this.props;
     const uid = navigation.getParam('uid');
@@ -182,7 +179,8 @@ class SearchScreen extends Component {
     this.setState({
       pressStatus: 0,
       filtersActive: false,
-      filterOption: -1
+      filterOption: -1,
+      typeProduct: ''
     });
   }
 
@@ -282,7 +280,7 @@ export default SearchScreen;
 
 const styles = StyleSheet.create({
   container: {
-    // flex: 1
+    flex: 1
   },
   searchOptions: {
     // flex: 0.5,
@@ -292,7 +290,7 @@ const styles = StyleSheet.create({
   },
   searchBar: {
     // flex: 1,
-    paddingTop: 30,
+    paddingTop: 5,
     alignItems: 'center'
     // width: '100%'
     // backgroundColor: Colors.secondaryLightColor
@@ -300,14 +298,12 @@ const styles = StyleSheet.create({
   options: {
     flexDirection: 'row',
     justifyContent: 'space-around',
-    paddingVertical: 20
+    paddingVertical: 5
   },
   option: {
     height: 150,
     width: '45%',
     borderRadius: 20
-    // backgroundColor: Colors.secondaryColor,
-    // paddingVertical: 20,
   },
   optionPressed: {
     height: 150,
@@ -317,29 +313,29 @@ const styles = StyleSheet.create({
   },
   imageOption: {
     width: '100%',
-    height: '100%'
+    height: '100%',
+    justifyContent: 'center'
   },
   textOption: {
     textAlign: 'center',
-    fontSize: 22,
-    paddingTop: 50
+    fontSize: 24
+    // color: Colors.white,
+    // fontWeight: "bold"
   },
   title: {
-    padding: 20,
-    textAlign: 'center',
-    marginBottom: 5
+    padding: 5,
+    textAlign: 'center'
   },
-  //------------------------------------------
   textInput: {
     flex: 1,
     borderRadius: 8,
     height: 40,
     borderWidth: 2,
-    borderColor: colors.primaryColor,
+    borderColor: Colors.primaryColor,
     margin: 10,
     padding: 10,
-    color: colors.primaryTextColor,
-    backgroundColor: colors.white
+    color: Colors.primaryTextColor,
+    backgroundColor: Colors.white
   },
   button: {
     height: 15,
@@ -348,13 +344,15 @@ const styles = StyleSheet.create({
     marginLeft: 5
   },
   sectionTop: {
-    // backgroundColor: colors.secondaryColor,
-    padding: 20,
+    //? CONTENEDOR DEL BOTON PARA DATOS DE USUARIO
+    // backgroundColor: Colors.secondaryColor,
+    padding: 5,
+    marginTop: 10,
     flexDirection: 'row-reverse'
   },
   userButton: {
-    borderColor: colors.primaryColor,
-    backgroundColor: colors.primaryColor,
+    borderColor: Colors.primaryColor,
+    backgroundColor: Colors.primaryColor,
     borderWidth: 1.5,
     borderRadius: 30,
     width: 40,

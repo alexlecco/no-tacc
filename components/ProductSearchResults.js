@@ -4,42 +4,52 @@ import colors from '../constants/Colors';
 import ProductCard from './ProductCard';
 import { Spinner } from 'native-base';
 
-
 export default class ProductSearchResults extends Component {
-    render() {
-        const { products, showOrHideProductByStores } = this.props;
-        // console.log('productos en result:', this.props.products);        
-        return(
-            products.length === 0 ?
-                <View style={styles.loading}><Text style={styles.title}> Cargando </Text><Spinner></Spinner></View>
-
-                :
-                <React.Fragment>
-                    <Text style={styles.title}> { products.length } productos encontrados </Text>
-                    <FlatList
-                        style={styles.flatList}
-                        data={products}
-                        renderItem={product => <ProductCard product={product} showOrHideProductByStores={showOrHideProductByStores} />}
-                        keyExtractor={(product, index) => { return product.id.toString() }}
-                    />
-                </React.Fragment>
-        )
-    }
+  render() {
+    const { products, showOrHideProductByStores } = this.props;
+    // console.log('productos en result:', this.props.products);
+    return products.length === 0 ? (
+      <View style={styles.loading}>
+        <Text style={styles.title}> Cargando </Text>
+        <Spinner></Spinner>
+      </View>
+    ) : (
+      <React.Fragment>
+        <Text style={styles.title}>
+          {' '}
+          {products.length} productos encontrados{' '}
+        </Text>
+        <FlatList
+          style={styles.flatList}
+          data={products}
+          renderItem={product => (
+            <ProductCard
+              product={product}
+              showOrHideProductByStores={showOrHideProductByStores}
+            />
+          )}
+          keyExtractor={(product, index) => {
+            return product.id.toString();
+          }}
+        />
+      </React.Fragment>
+    );
+  }
 }
 
 const styles = StyleSheet.create({
-    title: {
-        color: colors.white,
-        textAlign: 'center',
-        paddingTop: 20,
-        paddingBottom: 5
-    },
-    loading: {
-        flex: 1,
-        alignItems: 'center',
-        justifyContent: 'center',
-    },
-    flatList:{
-        flex: .5
-    }
+  title: {
+    color: colors.white,
+    textAlign: 'center',
+    paddingTop: 20,
+    paddingBottom: 5
+  },
+  loading: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center'
+  },
+  flatList: {
+    flex: 0.5
+  }
 });

@@ -57,8 +57,8 @@ const styles = StyleSheet.create({
   },
   buttonPressed: {
     backgroundColor: Colors.secondaryDarkColor,
-    margin: 5,
     width: '33%',
+    margin: 5,
     borderRadius: 5
 
     // opacity: .7,
