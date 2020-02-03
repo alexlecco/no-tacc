@@ -31,6 +31,11 @@ export default class StoreCard extends Component {
           id: child.val().id,
           address: child.val().address,
           name: child.val().name,
+          distance: child.val().distance,
+          location: {
+            latitude: child.val().location.latitude,
+            longitude: child.val().location.longitude
+          },
           _key: child.key
         });
       });
@@ -49,10 +54,9 @@ export default class StoreCard extends Component {
   }
 
   render() {
-    const { store } = this.state;
+    const { orderedStores } = this.props;
     const productByStores = this.props.productByStores.item;
-    console.log('store: ', store);
-    console.log('stores: ', productByStores);
+    const store = orderedStores.find(store => store.id === productByStores.store)
     
     return (
       <View style={styles.card}>
@@ -60,10 +64,13 @@ export default class StoreCard extends Component {
         <View style={styles.store}>
           <Text style={styles.name}> {store.name} </Text>
           <Text style={styles.address}>
+            Distancia: {store.distance} m
+          </Text>
+          <Text style={styles.address}>
             Dirección: {store.address}
           </Text>
           <Text style={styles.address}>
-            Precio: ${ productByStores.price }
+            Precio en este local: ${ productByStores.price }
           </Text>
         </View>
       </View>

@@ -106,7 +106,6 @@ class SearchScreen extends Component {
           this.state.celiac_status = child.val().celiac_status;
       });
     });
-    // console.log('usuario: ', this.state.user);
   }
 
   componentDidMount() {

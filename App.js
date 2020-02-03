@@ -90,10 +90,7 @@ export default class App extends Component {
     } else {
       this.setState({
         ProductByStoresVisible: !this.state.ProductByStoresVisible,
-        product: {
-          name: '',
-          id: product.id
-        }
+        product: {}
       });
     }
   }

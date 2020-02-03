@@ -47,7 +47,6 @@ class ProfileScreen extends Component {
         ? this.onValueChange('key1')
         : this.onValueChange('key0');
     });
-    // console.log('usuario: ', this.state.user);
   }
 
   componentDidMount() {
@@ -71,7 +70,6 @@ class ProfileScreen extends Component {
         this.state.user.celiac_status = true;
         break;
     }
-    // console.log(this.state.user);
   }
 
   next() {

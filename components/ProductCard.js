@@ -3,7 +3,6 @@ import { View, Text, StyleSheet, Image, TouchableWithoutFeedback} from 'react-na
 
 import Colors from '../constants/Colors';
 
-
 export default class ProductCard extends Component {
   constructor(props) {
     super(props);
