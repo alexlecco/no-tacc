@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet, Button } from 'react-native';
 
 import ProductSearchResults from '../components/ProductSearchResults';
 import ProductByStores from '../components/ProductByStores';
@@ -13,7 +13,7 @@ class ProductsScreen extends Component {
       products: [],
       stores: [],
       product: {},
-      ProductByStoresVisible: false,
+      ProductByStoresVisible: false
     };
 
     showOrHideProductByStores = this.showOrHideProductByStores.bind(this);
@@ -72,7 +72,6 @@ class ProductsScreen extends Component {
     }
   }
 
-
   render() {
     const {product, stores} = this.state;
     return (
@@ -91,6 +90,7 @@ class ProductsScreen extends Component {
             )}
           />
         )}
+        {/* <Button title="volver" onPress={() => this.props.navigation.navigate('SearchScreen')} /> */}
       </View>
     );
   }

@@ -15,11 +15,10 @@ import {
 } from 'react-native';
 
 import colors from './constants/Colors';
-import ProductSearchResults from './components/ProductSearchResults';
-import ProductByStores from './components/ProductByStores';
+
 
 import { firebaseApp } from './config/firebase';
-import * as Google from 'expo-google-app-auth';
+import * as Font from 'expo-font';
 
 import { createAppContainer, createSwitchNavigator } from 'react-navigation';
 
@@ -70,6 +69,13 @@ export default class App extends Component {
   componentWillMount() {
     this.listenForProducts(this.productsRef);
     this.listenForActiveApp(this.activeAppRef);
+  }
+
+  async componentDidMount() {
+    await Font.loadAsync({
+      Roboto: require('native-base/Fonts/Roboto.ttf'),
+      Roboto_medium: require('native-base/Fonts/Roboto_medium.ttf'),
+    });
   }
 
   showOrHideProductByStores(product) {

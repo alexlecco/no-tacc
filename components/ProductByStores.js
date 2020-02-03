@@ -165,10 +165,10 @@ export default class ProductByStores extends Component {
                             }
                 keyExtractor={(product, index) => { return product.id.toString() }}
             />
-          <Button
+          {/* <Button
             title="volver"
             onPress={() => this.props.showOrHideProductByStores(product)}
-          />
+          /> */}
           </View>
         </View>
     );
