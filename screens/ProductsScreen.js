@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet, Button } from 'react-native';
 
 import ProductSearchResults from '../components/ProductSearchResults';
 import ProductByStores from '../components/ProductByStores';
@@ -10,11 +10,10 @@ class ProductsScreen extends Component {
     this.state = {
       products: [],
       product: {},
-      ProductByStoresVisible: false,
+      ProductByStoresVisible: false
     };
 
     showOrHideProductByStores = this.showOrHideProductByStores.bind(this);
-
   }
 
   getProducts() {
@@ -25,8 +24,6 @@ class ProductsScreen extends Component {
     // console.log('productos enviados de search: ', products);
     // console.log('productos: ', this.state.products);
   }
-
-
 
   showOrHideProductByStores(product) {
     if (!this.state.ProductByStoresVisible) {
@@ -48,9 +45,8 @@ class ProductsScreen extends Component {
     }
   }
 
-
   render() {
-    const {product} = this.state;
+    const { product } = this.state;
     return (
       <View style={styles.container}>
         {this.state.ProductByStoresVisible ? (
@@ -68,6 +64,7 @@ class ProductsScreen extends Component {
             )}
           />
         )}
+        {/* <Button title="volver" onPress={() => this.props.navigation.navigate('SearchScreen')} /> */}
       </View>
     );
   }

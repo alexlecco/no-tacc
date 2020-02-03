@@ -70,10 +70,10 @@ export default class ProductByStores extends Component {
                 renderItem={productByStores => <StoreCard productByStores={productByStores} product={product} />}
                 keyExtractor={(product, index) => { return product.id.toString() }}
             />
-          <Button
+          {/* <Button
             title="volver"
             onPress={() => this.props.showOrHideProductByStores(product)}
-          />
+          /> */}
           </View>
         </View>
     );
