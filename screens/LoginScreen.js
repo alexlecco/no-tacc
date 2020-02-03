@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { View, Text, StyleSheet, Button, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, ActivityIndicator } from 'react-native';
 import * as Google from 'expo-google-app-auth';
 import { firebaseApp } from '../config/firebase';
 import Colors from '../constants/Colors';
@@ -7,6 +7,9 @@ import Colors from '../constants/Colors';
 class LoginScreen extends Component {
   constructor(props) {
     super(props);
+    this.state = {
+      pressStatus: false
+    };
   }
   //SIGN IN FLOW f/ FIREBASE
   onSignIn = googleUser => {
@@ -85,9 +88,12 @@ class LoginScreen extends Component {
 
   async googleSignIn() {
     try {
+      this.setState({ pressStatus: true });
       const result = await Google.logInAsync({
-        androidClientId:              '246004460762-jl6rcssbqu36s3l6vg28h5gd5u8pimbk.apps.googleusercontent.com',
-        androidStandaloneAppClientId: '34893812883-bkpmjbnd8alpr3voos79htji42kvpf25.apps.googleusercontent.com',
+        androidClientId:
+          '246004460762-jl6rcssbqu36s3l6vg28h5gd5u8pimbk.apps.googleusercontent.com',
+        androidStandaloneAppClientId:
+          '34893812883-bkpmjbnd8alpr3voos79htji42kvpf25.apps.googleusercontent.com',
         scopes: ['profile', 'email']
       });
 
@@ -102,9 +108,11 @@ class LoginScreen extends Component {
         // }
       } else {
         console.log('cancelled');
+        this.setState({ pressStatus: false });
       }
     } catch (e) {
       console.log('error', e);
+      this.setState({ pressStatus: false });
     }
   }
   async googleSignOut() {
@@ -115,14 +123,17 @@ class LoginScreen extends Component {
   render() {
     return (
       <View style={styles.container}>
-        {/* <Button
-            title='ingresá con Google'
-            onPress={() => {
-              this.googleSignIn();
-            }}
-          /> */}
+        <Text style={{ padding: 100, fontSize: 100 }}>LOGO</Text>
+        {this.state.pressStatus ? (
+          <React.Fragment>
+            <ActivityIndicator style={{padding: 30}} size="large" />
+          </React.Fragment>
+        ) : (
+          <View></View>
+        )}
         <TouchableOpacity
-          style={styles.button}
+          style={this.state.pressStatus ? styles.buttonPressed : styles.button}
+          disabled={this.state.pressStatus}
           onPress={() => this.googleSignIn()}
         >
           <Text style={styles.buttonText}>Ingresá con Google</Text>
@@ -141,11 +152,22 @@ const styles = StyleSheet.create({
   },
   button: {
     borderWidth: 1,
+    borderRadius: 5,
     backgroundColor: Colors.secondaryDarkColor,
     borderColor: Colors.secondaryDarkColor,
     width: '80%',
     height: 50,
     justifyContent: 'center'
+  },
+  buttonPressed: {
+    borderWidth: 1,
+    borderRadius: 5,
+    backgroundColor: Colors.primaryOpacityColor,
+    borderColor: Colors.primaryOpacityColor,
+    width: '80%',
+    height: 50,
+    justifyContent: 'center',
+    opacity: 0.3
   },
   buttonText: {
     fontSize: 20,

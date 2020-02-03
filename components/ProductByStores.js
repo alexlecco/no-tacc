@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { View, Text, StyleSheet, Button, Image, Dimensions, FlatList, Platform } from "react-native";
+import { View, Text, StyleSheet, Button, Image, Dimensions, FlatList, Platform, ActivityIndicator } from "react-native";
 
 import Constants from 'expo-constants';
 import * as Location from 'expo-location';
@@ -143,7 +143,7 @@ export default class ProductByStores extends Component {
 
     return (
       this.state.loading ?
-        <View style={styles.loading}><Text style={styles.title}> Cargando </Text></View>
+        <View style={styles.loading}><Text style={styles.title}> Cargando </Text><ActivityIndicator/></View>
       :
         <View style={styles.container}>
           <View>
@@ -165,10 +165,6 @@ export default class ProductByStores extends Component {
                             }
                 keyExtractor={(product, index) => { return product.id.toString() }}
             />
-          {/* <Button
-            title="volver"
-            onPress={() => this.props.showOrHideProductByStores(product)}
-          /> */}
           </View>
         </View>
     );
