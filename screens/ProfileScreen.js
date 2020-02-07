@@ -6,10 +6,9 @@ import {
   View,
   Image,
   SafeAreaView,
-  Button,
-  ActivityIndicator
+  ActivityIndicator,
+  Switch
 } from 'react-native';
-import { Icon } from 'native-base';
 
 import { firebaseApp } from '../config/firebase';
 import colors from '../constants/Colors';
@@ -22,7 +21,7 @@ class ProfileScreen extends Component {
       user: {
         first_name: '',
         last_name: '',
-        celiac_status: false
+        celiac_status: false,
       },
       selected: 'key0',
       isUser: false
@@ -31,6 +30,7 @@ class ProfileScreen extends Component {
     uid = navigation.getParam('uid');
     this.userRef = firebaseApp.database().ref('users/' + uid);
   }
+
   async getUserData() {
     await this.userRef.once('value', snap => {
       this.setState({
@@ -41,12 +41,29 @@ class ProfileScreen extends Component {
           last_name: snap.val().last_name,
           profile_picture: snap.val().profile_picture
         },
+        preferences: {
+          products: {
+            prod01: snap.val().preferences.products.prod01,
+            prod02: snap.val().preferences.products.prod02,
+            prod03: snap.val().preferences.products.prod03,
+          },
+          dishes: {
+            dish01: snap.val().preferences.dishes.dish01,
+            dish02: snap.val().preferences.dishes.dish02,
+            dish03: snap.val().preferences.dishes.dish03,
+          }
+        },
         isUser: true
       });
+
       this.state.user.celiac_status
         ? this.onValueChange('key1')
         : this.onValueChange('key0');
     });
+  }
+
+  setUserData() {
+    
   }
 
   componentDidMount() {
@@ -74,11 +91,37 @@ class ProfileScreen extends Component {
 
   next() {
     this.onValueChange(this.state.selected);
-    this.userRef.update({ celiac_status: this.state.user.celiac_status });
+    this.userRef.update({
+      celiac_status: this.state.user.celiac_status,
+      preferences: {
+        products: {
+          prod01: this.state.preferences.products.prod01,
+          prod02: this.state.preferences.products.prod02,
+          prod03: this.state.preferences.products.prod03,
+        },
+        dishes: {
+          dish01: this.state.preferences.dishes.dish01,
+          dish02: this.state.preferences.dishes.dish02,
+          dish03: this.state.preferences.dishes.dish03,
+        }
+      }
+    });
     this.props.navigation.navigate('SearchScreen', {
       uid: this.state.user.uid
     });
   }
+
+  _handleToggleProd01() { this.setState({preferences: { products: { prod01: !this.state.preferences.products.prod01, prod02: this.state.preferences.products.prod02, prod03: this.state.preferences.products.prod03}, dishes: { dish01: this.state.preferences.dishes.dish01, dish02: this.state.preferences.dishes.dish02, dish03: this.state.preferences.dishes.dish03}}})}
+
+  _handleToggleProd02() { this.setState({preferences: { products: { prod01: this.state.preferences.products.prod01, prod02: !this.state.preferences.products.prod02, prod03: this.state.preferences.products.prod03}, dishes: { dish01: this.state.preferences.dishes.dish01, dish02: this.state.preferences.dishes.dish02, dish03: this.state.preferences.dishes.dish03}}})}
+  
+  _handleToggleProd03() { this.setState({preferences: { products: { prod01: this.state.preferences.products.prod01, prod02: this.state.preferences.products.prod02, prod03: !this.state.preferences.products.prod03}, dishes: { dish01: this.state.preferences.dishes.dish01, dish02: this.state.preferences.dishes.dish02, dish03: this.state.preferences.dishes.dish03}}})}
+
+  _handleToggleDish01() { this.setState({preferences: { products: { prod01: this.state.preferences.products.prod01, prod02: this.state.preferences.products.prod02, prod03: this.state.preferences.products.prod03}, dishes: { dish01: !this.state.preferences.dishes.dish01, dish02: this.state.preferences.dishes.dish02, dish03: this.state.preferences.dishes.dish03}}})}
+
+  _handleToggleDish02() { this.setState({preferences: { products: { prod01: this.state.preferences.products.prod01, prod02: this.state.preferences.products.prod02, prod03: this.state.preferences.products.prod03}, dishes: { dish01: this.state.preferences.dishes.dish01, dish02: !this.state.preferences.dishes.dish02, dish03: this.state.preferences.dishes.dish03}}})}
+  
+  _handleToggleDish03() { this.setState({preferences: { products: { prod01: this.state.preferences.products.prod01, prod02: this.state.preferences.products.prod02, prod03: this.state.preferences.products.prod03}, dishes: { dish01: this.state.preferences.dishes.dish01, dish02: this.state.preferences.dishes.dish02, dish03: !this.state.preferences.dishes.dish03}}})}
 
   render() {
     return (
@@ -98,16 +141,70 @@ class ProfileScreen extends Component {
                     this.state.user.first_name}
                 </Text>
                 <Text style={styles.info}>Grado de Celiaquia: </Text>
-                <Picker
-                  note
-                  mode='dropdown'
-                  style={styles.picker}
-                  selectedValue={this.state.selected}
-                  onValueChange={this.onValueChange.bind(this)}
-                >
-                  <Picker.Item label='Grado 1: Leve/Moderado' value='key0' />
-                  <Picker.Item label='Grado 2: Grave' value='key1' />
-                </Picker>
+
+                <View style={styles.pickerContainer}>
+                  <Picker
+                    note
+                    mode='dropdown'
+                    style={styles.picker}
+                    selectedValue={this.state.selected}
+                    onValueChange={this.onValueChange.bind(this)}
+                  >
+                    <Picker.Item label='Grado 1: Leve/Moderado' value='key0' />
+                    <Picker.Item label='Grado 2: Grave' value='key1' />
+                  </Picker>
+                </View>
+                
+                <Text style={styles.info}>Gustos y preferencias: </Text>
+                  <View style={styles.panelsContainer}>
+                    <View style={styles.panel}>
+
+                      <Text>bebidas con alcohol</Text>
+                      <Switch
+                        onValueChange={() => this._handleToggleProd01()}
+                        value={this.state.preferences.products.prod01}
+                        trackColor={{true: colors.secondaryDarkColor, false: 'grey'}}
+                      />
+                      
+                      <Text>panificados dulces</Text>
+                      <Switch
+                        onValueChange={() => this._handleToggleProd02()}
+                        value={this.state.preferences.products.prod02}
+                        trackColor={{true: colors.secondaryDarkColor, false: 'grey'}}
+                      />
+                      
+                      <Text>chocolates sin azucar</Text>
+                      <Switch
+                        onValueChange={() => this._handleToggleProd03()}
+                        value={this.state.preferences.products.prod03}
+                        trackColor={{true: colors.secondaryDarkColor, false: 'grey'}}
+                      />
+                    </View>
+                    <View style={styles.panel}>
+
+                      <Text>pizzas</Text>
+                      <Switch
+                        onValueChange={() => this._handleToggleDish01()}
+                        value={this.state.preferences.dishes.dish01}
+                        trackColor={{true: colors.secondaryLightColor, false: 'grey'}}
+                      />
+                      
+                      <Text>pescado</Text>
+                      <Switch
+                        onValueChange={() => this._handleToggleDish02()}
+                        value={this.state.preferences.dishes.dish02}
+                        trackColor={{true: colors.secondaryLightColor, false: 'grey'}}
+                      />
+                      
+                      <Text>milanesas</Text>
+                      <Switch
+                        onValueChange={() => this._handleToggleDish03()}
+                        value={this.state.preferences.dishes.dish03}
+                        trackColor={{true: colors.secondaryLightColor, false: 'grey'}}
+                      />            
+                    </View>
+                  </View>
+
               </View>
             </View>
             <View style={styles.button}>
@@ -116,7 +213,6 @@ class ProfileScreen extends Component {
                 onPress={() => this.next()}
               >
                 <Text>Continuar</Text>
-                {/* <Icon name='arrow-forward' /> */}
               </TouchableOpacity>
             </View>
           </React.Fragment>
@@ -165,7 +261,8 @@ const styles = StyleSheet.create({
   info: {
     fontSize: 16,
     color: colors.primaryTextColor,
-    marginHorizontal: 10
+    marginHorizontal: 10,
+    marginTop: 20
   },
   description: {
     fontSize: 16,
@@ -183,5 +280,23 @@ const styles = StyleSheet.create({
     position: 'absolute',
     bottom: 20,
     right: 10
+  },
+  pickerContainer: {
+    height: 50,
+    backgroundColor: 'powderblue',
+    width: '100%',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  panelsContainer: {
+    flex: 1,
+    flexDirection: 'row',
+  },
+  panel: {
+    justifyContent: 'center',
+    alignItems: 'center',
+    width: '50%',
+    height: 200,
+    backgroundColor: 'powderblue'
   }
 });
