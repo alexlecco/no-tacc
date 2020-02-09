@@ -106,9 +106,15 @@ class SearchScreen extends Component {
           this.state.celiac_status = child.val().celiac_status;
       });
     });
+    // console.log('usuario stado:', this.state.celiac_status);
   }
 
   componentDidMount() {
+    this.getUserData();
+  }
+
+  //! Revisar
+  componentDidUpdate(){
     this.getUserData();
   }
 
@@ -129,6 +135,7 @@ class SearchScreen extends Component {
             name: child.val().name,
             brand: child.val().brand,
             quantity: child.val().quantity,
+            origin: child.val().origin,
             marsh3Allowed: child.val().marsh3Allowed,
             _key: child.key
           });

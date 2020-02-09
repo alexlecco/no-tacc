@@ -14,7 +14,10 @@ class FilterProduct extends Component {
   
 
   updateActiveOption = (activeOption) => {
-    if(activeOption === this.state.activeOption) this.state.activeOption = '';
+    if(activeOption === this.state.activeOption){
+      this.state.activeOption = '';
+      this.props.addFilterOption(-1);
+  }
     else {
       this.setState({
         activeOption,
@@ -59,6 +62,7 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.secondaryDarkColor,
     width: '33%',
     margin: 5,
+    justifyContent: 'center',
     borderRadius: 5
 
     // opacity: .7,

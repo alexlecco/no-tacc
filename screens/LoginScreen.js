@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ActivityIndicator } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, ActivityIndicator, Image } from 'react-native';
 import * as Google from 'expo-google-app-auth';
 import { firebaseApp } from '../config/firebase';
 import Colors from '../constants/Colors';
@@ -123,7 +123,7 @@ class LoginScreen extends Component {
   render() {
     return (
       <View style={styles.container}>
-        <Text style={{ padding: 100, fontSize: 100 }}>LOGO</Text>
+        <Image style={styles.logo} source={require('../assets/img/logo.png')} />
         {this.state.pressStatus ? (
           <React.Fragment>
             <ActivityIndicator style={{padding: 30}} size="large" />
@@ -174,5 +174,10 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     fontWeight: '400',
     color: 'white'
+  },
+  logo: {
+      width: '50%',
+      height: '50%',
+      resizeMode: 'contain'
   }
 });

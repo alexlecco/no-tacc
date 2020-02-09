@@ -16,7 +16,7 @@ import colors from '../constants/Colors';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 
 import firebase from 'firebase';
-
+import Colors from '../constants/Colors';
 
 class ProfileScreen extends Component {
   constructor(props) {
@@ -83,10 +83,9 @@ class ProfileScreen extends Component {
     });
   }
 
-  logout(){
+  logout() {
     firebase.auth().signOut();
     this.props.navigation.navigate('LoadingScreen');
-
   }
 
   render() {
@@ -120,16 +119,13 @@ class ProfileScreen extends Component {
               </View>
             </View>
             <View style={styles.button}>
-              <TouchableOpacity
-                style={{ flexDirection: 'row' }}
-                onPress={() => this.next()}
-              >
-                <Text>Guardar</Text>
+              <TouchableOpacity onPress={() => this.next()}>
+                <Text style={{ textAlign: 'center' }}>Guardar</Text>
               </TouchableOpacity>
             </View>
             <View style={styles.logout}>
               <TouchableOpacity onPress={() => this.logout()}>
-                <Text>Cerrar Sesión</Text>
+                <Text style={{ textAlign: 'center' }}>Cerrar Sesión</Text>
               </TouchableOpacity>
             </View>
           </React.Fragment>
@@ -194,12 +190,22 @@ const styles = StyleSheet.create({
   },
   button: {
     position: 'absolute',
-    bottom: 20,
-    right: 10
+    bottom: 30,
+    right: 15,
+    fontSize: 14,
+    width: '25%',
+    height: '5%',
+    borderRadius: 5,
+    justifyContent: 'center',
   },
   logout: {
     position: 'absolute',
-    bottom: 20,
-    left: 10
-  },
+    bottom: 30,
+    left: 15,
+    fontSize: 14,
+    width: '25%',
+    height: '5%',
+    borderRadius: 5,
+    justifyContent: 'center',
+  }
 });
