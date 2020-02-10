@@ -7,11 +7,6 @@ import {
   YellowBox,
   Platform,
   StatusBar,
-  TextInput,
-  TouchableOpacity,
-  Image,
-  Button,
-  AsyncStorage
 } from 'react-native';
 
 import colors from './constants/Colors';
@@ -22,21 +17,68 @@ import * as Font from 'expo-font';
 
 import { createAppContainer, createSwitchNavigator } from 'react-navigation';
 
+import { createStackNavigator } from 'react-navigation-stack';
+
 import LoadingScreen from './screens/LoadingScreen';
 import LoginScreen from './screens/LoginScreen';
 import ProductsScreen from './screens/ProductsScreen';
 import ProfileScreen from './screens/ProfileScreen';
 import SearchScreen from './screens/SearchScreen';
+import Colors from './constants/Colors';
 
 const AppSwitchNavigator = createSwitchNavigator({
   LoadingScreen: LoadingScreen,
   LoginScreen: LoginScreen,
-  ProductsScreen: ProductsScreen,
-  ProfileScreen: ProfileScreen,
+  // ProductsScreen: ProductsScreen,
+  // ProfileScreen: ProfileScreen,
   SearchScreen: SearchScreen
 });
 
-const AppNavigator = createAppContainer(AppSwitchNavigator);
+
+
+const AppStackNavigator = createStackNavigator({
+  // LoadingScreen: LoadingScreen,
+  // LoginScreen: LoginScreen,
+  PRCeliaco: {
+    screen: AppSwitchNavigator,
+    navigationOptions: {
+      headerShown: false,
+    }
+  },
+  ProductsScreen: {
+    screen: ProductsScreen,
+    navigationOptions: {
+      headerTitle: 'Lista de Productos'
+    }
+  },
+  ProfileScreen: {
+    screen: ProfileScreen,
+    navigationOptions: {
+      headerTitle: 'Perfil de Usuario'
+    }
+  },
+  // SearchScreen: SearchScreen
+},
+{
+  initialRouteName: 'PRCeliaco',
+  headerMode: 'screen' ,
+  /* The header config from HomeScreen is now here */
+  defaultNavigationOptions: {
+    headerStyle: {
+      backgroundColor: Colors.primaryDarkColor,      
+    },
+    cardStyle: {
+      backgroundColor: colors.primaryColor,
+
+    }
+
+
+  },
+}
+);
+
+const AppNavigator = createAppContainer(AppStackNavigator);
+
 
 export default class App extends Component {
   constructor(props) {

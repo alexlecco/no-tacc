@@ -15,6 +15,9 @@ import { firebaseApp } from '../config/firebase';
 import colors from '../constants/Colors';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 
+import firebase from 'firebase';
+import Colors from '../constants/Colors';
+
 class ProfileScreen extends Component {
   constructor(props) {
     super(props);
@@ -80,9 +83,14 @@ class ProfileScreen extends Component {
     });
   }
 
+  logout() {
+    firebase.auth().signOut();
+    this.props.navigation.navigate('LoadingScreen');
+  }
+
   render() {
     return (
-      <SafeAreaView style={{flex: 1}}>
+      <SafeAreaView style={{ flex: 1 }}>
         {this.state.isUser ? (
           <React.Fragment>
             <View style={styles.header}></View>
@@ -97,31 +105,32 @@ class ProfileScreen extends Component {
                     ', ' +
                     this.state.user.first_name}
                 </Text>
-                <Text style={styles.info}>Grado de Celiaquia: </Text>
+                <Text style={styles.info}>Grado de Celiaquía: </Text>
                 <Picker
                   note
-                  mode='dropdown'
+                  mode="dropdown"
                   style={styles.picker}
                   selectedValue={this.state.selected}
                   onValueChange={this.onValueChange.bind(this)}
                 >
-                  <Picker.Item label='Grado 1: Leve/Moderado' value='key0' />
-                  <Picker.Item label='Grado 2: Grave' value='key1' />
+                  <Picker.Item label="Grado 1: Leve/Moderado" value="key0" />
+                  <Picker.Item label="Grado 2: Grave" value="key1" />
                 </Picker>
               </View>
             </View>
             <View style={styles.button}>
-              <TouchableOpacity
-                style={{ flexDirection: 'row' }}
-                onPress={() => this.next()}
-              >
-                <Text>Continuar</Text>
-                {/* <Icon name='arrow-forward' /> */}
+              <TouchableOpacity onPress={() => this.next()}>
+                <Text style={{ textAlign: 'center' }}>Guardar</Text>
+              </TouchableOpacity>
+            </View>
+            <View style={styles.logout}>
+              <TouchableOpacity onPress={() => this.logout()}>
+                <Text style={{ textAlign: 'center' }}>Cerrar Sesión</Text>
               </TouchableOpacity>
             </View>
           </React.Fragment>
         ) : (
-          <ActivityIndicator style={styles.load} size='large' />
+          <ActivityIndicator style={styles.load} size="large" />
         )}
       </SafeAreaView>
     );
@@ -181,7 +190,22 @@ const styles = StyleSheet.create({
   },
   button: {
     position: 'absolute',
-    bottom: 20,
-    right: 10
+    bottom: 30,
+    right: 15,
+    fontSize: 14,
+    width: '25%',
+    height: '5%',
+    borderRadius: 5,
+    justifyContent: 'center',
+  },
+  logout: {
+    position: 'absolute',
+    bottom: 30,
+    left: 15,
+    fontSize: 14,
+    width: '25%',
+    height: '5%',
+    borderRadius: 5,
+    justifyContent: 'center',
   }
 });
