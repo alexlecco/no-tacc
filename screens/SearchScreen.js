@@ -9,12 +9,16 @@ import {
   Image,
   TextInput,
   ImageBackground,
-  KeyboardAvoidingView
+  KeyboardAvoidingView,
+  ScrollView,
+  Dimensions
 } from 'react-native';
 import { Icon } from 'native-base';
 import Colors from '../constants/Colors';
 import { firebaseApp } from '../config/firebase';
 import FilterProduct from '../components/FilterProduct';
+import CategoryButton from '../components/CategoryButton';
+import { DISHES, PRODUCTS } from '../constants/Category';
 
 const platos = ['Desayuno', 'Almuerzo', 'Merienda', 'Cena'];
 const productos = [
@@ -24,6 +28,8 @@ const productos = [
   'Cereales',
   'Harinas'
 ];
+const screenWidth = Math.round(Dimensions.get('window').width);
+const screenHeight = Math.round(Dimensions.get('window').height);
 
 class SearchScreen extends Component {
   constructor(props) {
@@ -114,7 +120,7 @@ class SearchScreen extends Component {
   }
 
   //! Revisar
-  componentDidUpdate(){
+  componentDidUpdate() {
     this.getUserData();
   }
 
@@ -174,7 +180,6 @@ class SearchScreen extends Component {
     });
   } //! END SEARCH PRODUCT METHOD
 
-
   goToProfile() {
     const { navigation } = this.props;
     const uid = navigation.getParam('uid');
@@ -215,69 +220,96 @@ class SearchScreen extends Component {
   }
 
   render() {
+    const productos = PRODUCTS.map((item, index) => (
+      <CategoryButton key={index} title={item.title} url={item.id} />
+    ));
+    const platos = DISHES.map((item, index) => (
+      <CategoryButton key={index} title={item.title} url={item.id} />
+    ));
     return (
       <SafeAreaView style={styles.container}>
-        <View style={styles.sectionTop}>
-          <TouchableOpacity
-            style={styles.userButton}
-            onPress={() => this.goToProfile()}
-          >
-            <Icon name="person" />
-          </TouchableOpacity>
-        </View>
-        <View style={styles.searchOptions}>
-          <Text style={styles.title}>
-            Ingrese el tipo de producto que desea
-          </Text>
-          <View style={styles.options}>
-            <TouchableHighlight
-              onPress={() => this.pressed('prod', 1)}
-              style={
-                this.state.pressStatus === 1
-                  ? styles.optionPressed
-                  : styles.option
-              }
+        <ScrollView>
+          <View style={styles.sectionTop}>
+            <TouchableOpacity
+              style={styles.userButton}
+              onPress={() => this.goToProfile()}
             >
-              <ImageBackground
-                source={require('../assets/img/productos.jpg')}
-                imageStyle={{ borderRadius: 20 }}
-                style={styles.imageOption}
-              >
-                <Text style={styles.textOption}>Productos</Text>
-              </ImageBackground>
-            </TouchableHighlight>
-            <TouchableHighlight
-              onPress={() => this.pressed('meal', 2)}
-              style={
-                this.state.pressStatus === 2
-                  ? styles.optionPressed
-                  : styles.option
-              }
-            >
-              <ImageBackground
-                source={require('../assets/img/platos.jpg')}
-                imageStyle={{ borderRadius: 20 }}
-                style={styles.imageOption}
-              >
-                <Text style={styles.textOption}>Platos</Text>
-              </ImageBackground>
-            </TouchableHighlight>
+              <Icon name="person" />
+            </TouchableOpacity>
           </View>
-          {this.state.filtersActive ? (
-            <React.Fragment>
-              <FilterProduct
-                list={this.state.list}
-                addFilterOption={this.addFilterOption.bind(this)}
-              />
-            </React.Fragment>
-          ) : (
-            <View></View>
-          )}
-        </View>
-        <View style={styles.searchBar}>
-          <Text>Ingrese el nombre del producto</Text>
-          {this.renderSearchBar()}
-        </View>
+          <View style={styles.searchOptions}>
+            <Text style={styles.title}>
+              Ingrese el tipo de producto que desea
+            </Text>
+            <View style={styles.options}>
+              <TouchableHighlight
+                onPress={() => this.pressed('prod', 1)}
+                style={
+                  this.state.pressStatus === 1
+                    ? styles.optionPressed
+                    : styles.option
+                }
+              >
+                <ImageBackground
+                  source={require('../assets/img/productos.jpg')}
+                  imageStyle={{ borderRadius: 20 }}
+                  style={styles.imageOption}
+                >
+                  <Text style={styles.textOption}>Productos</Text>
+                </ImageBackground>
+              </TouchableHighlight>
+              <TouchableHighlight
+                onPress={() => this.pressed('meal', 2)}
+                style={
+                  this.state.pressStatus === 2
+                    ? styles.optionPressed
+                    : styles.option
+                }
+              >
+                <ImageBackground
+                  source={require('../assets/img/platos.jpg')}
+                  imageStyle={{ borderRadius: 20 }}
+                  style={styles.imageOption}
+                >
+                  <Text style={styles.textOption}>Platos</Text>
+                </ImageBackground>
+              </TouchableHighlight>
+            </View>
+            {this.state.filtersActive ? (
+              <React.Fragment>
+                <FilterProduct
+                  list={this.state.list}
+                  addFilterOption={this.addFilterOption.bind(this)}
+                />
+              </React.Fragment>
+            ) : (
+              <View></View>
+            )}
+          </View>
+          <View style={styles.searchBar}>
+            <Text>Ingrese el nombre del producto</Text>
+            {this.renderSearchBar()}
+          </View>
+
+          <View style={styles.recomendations}>
+            <Text style={{ paddingLeft: 10 }}>Platos recomendados</Text>
+            <ScrollView
+              horizontal={true}
+              showsHorizontalScrollIndicator={false}
+            >
+              {platos}
+            </ScrollView>
+          </View>
+          <View style={styles.recomendations}>
+            <Text style={{ paddingLeft: 10 }}>Productos recomendados</Text>
+            <ScrollView
+              horizontal={true}
+              showsHorizontalScrollIndicator={false}
+            >
+              {productos}
+            </ScrollView>
+          </View>
+        </ScrollView>
       </SafeAreaView>
     );
   }
@@ -307,13 +339,13 @@ const styles = StyleSheet.create({
     paddingVertical: 5
   },
   option: {
-    height: 150,
-    width: '45%',
+    height: screenHeight * 0.2,
+    width: screenWidth * 0.4,
     borderRadius: 20
   },
   optionPressed: {
-    height: 150,
-    width: '45%',
+    height: screenHeight * 0.2,
+    width: screenWidth * 0.4,
     borderRadius: 20,
     opacity: 0.65
   },
