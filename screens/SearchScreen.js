@@ -37,6 +37,10 @@ class SearchScreen extends Component {
     this.state = {
       searchText: '',
       celiac_status: {},
+      userPreferences: {
+        dishes: [],
+        products: []
+      },
       textInputStatus: 'untouched',
       food: false,
       typeProduct: '',
@@ -45,7 +49,10 @@ class SearchScreen extends Component {
       filtersActive: false,
       pressStatus: 0,
       list: [],
-      filterOption: -1
+      filterOption: -1,
+
+      gustos:[],
+      preferencias:[]
     };
     this.userRef = firebaseApp
       .database()
@@ -111,18 +118,20 @@ class SearchScreen extends Component {
     await this.userRef.once('value', snap => {
       snap.forEach(child => {
         if (child.key === uid)
-          this.state.celiac_status = child.val().celiac_status;
+          this.setState({
+            celiac_status: child.val().celiac_status,
+            userPreferences: {
+              dishes: child.val().preferences.dishes,
+              products: child.val().preferences.products
+            }
+          });
       });
     });
-    // console.log('usuario stado:', this.state.celiac_status);
+    this.makeArrays();
+    // console.log('preferences:', this.state.userPreferences);
   }
 
   componentDidMount() {
-    this.getUserData();
-  }
-
-  //! Revisar
-  componentDidUpdate() {
     this.getUserData();
   }
 
@@ -155,14 +164,23 @@ class SearchScreen extends Component {
       });
 
       // console.log('antes de los filtros: ', products);
-      
-      if(userCeliacStatus) products = products.filter(product => product.marsh3Allowed === userCeliacStatus);
+
+      if (userCeliacStatus)
+        products = products.filter(
+          product => product.marsh3Allowed === userCeliacStatus
+        );
       // console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>despues del celiac status: ', products);
-      if(type != '') products = products.filter(product => product.type === type);
+      if (type != '')
+        products = products.filter(product => product.type === type);
       // console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>despues del type: ', products);
-      if(filterOption != -1) products = products.filter(product => product.category === filterOption);
+      if (filterOption != -1)
+        products = products.filter(
+          product => product.category === filterOption
+        );
       // console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>despues de la categoria: ', products);
-      products = products.filter(product => product.name.toLowerCase().includes(searchTxt.toLowerCase()));
+      products = products.filter(product =>
+        product.name.toLowerCase().includes(searchTxt.toLowerCase())
+      );
       // console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>Array Final: ', products);
       this.props.navigation.navigate('ProductsScreen', { products });
     });
@@ -207,11 +225,11 @@ class SearchScreen extends Component {
     });
   }
 
-  getDish(index){
+  getDish(index) {
     this.searchProductBySubcategory(index, 'meal');
   }
 
-  getProd(index){
+  getProd(index) {
     this.searchProductBySubcategory(index, 'prod');
   }
 
@@ -233,22 +251,60 @@ class SearchScreen extends Component {
           _key: child.key
         });
       });
-      
-      if(userCeliacStatus) products = products.filter(product => product.marsh3Allowed === userCeliacStatus);
+
+      if (userCeliacStatus)
+        products = products.filter(
+          product => product.marsh3Allowed === userCeliacStatus
+        );
       products = products.filter(product => product.type === type);
-      products = products.filter(product => product.subcategory === subcategory);
+      products = products.filter(
+        product => product.subcategory === subcategory
+      );
       this.props.navigation.navigate('ProductsScreen', { products });
     });
   } //! END SEARCH PRODUCT METHOD
 
+  makeArrays() {
+    const dishes = Object.values(this.state.userPreferences.dishes);
+    const products = Object.values(this.state.userPreferences.products);
 
+    let platos = [];
+    let productos = [];
+    dishes.forEach((dish, index) => {
+      if (dish) platos.push(index);
+    });
+    products.forEach((product, index) => {
+      if (product) productos.push(index);
+    });
+
+    platos = DISHES.filter((item, index) => platos.includes(index));
+    productos = PRODUCTS.filter((item, index) => productos.includes(index));
+
+    this.setState({
+      gustos: platos,
+      preferencias: productos,
+    });
+  }
 
   render() {
-    const productos = PRODUCTS.map((item, index) => (
-      <CategoryButton key={index} getSubcategory={this.getProd.bind(this)} title={item.title} url={item.id} idx={index}/>
+    const {gustos, preferencias} = this.state;
+    const productos = preferencias.map((item, index) => (
+      <CategoryButton
+        key={index}
+        getSubcategory={this.getProd.bind(this)}
+        title={item.title}
+        url={item.id}
+        idx={index}
+      />
     ));
-    const platos = DISHES.map((item, index) => (
-      <CategoryButton key={index} getSubcategory={this.getDish.bind(this)} title={item.title} url={item.id} idx={index}/>
+    const platos = gustos.map((item, index) => (
+      <CategoryButton
+        key={index}
+        getSubcategory={this.getDish.bind(this)}
+        title={item.title}
+        url={item.id}
+        idx={index}
+      />
     ));
     return (
       <SafeAreaView style={styles.container}>
