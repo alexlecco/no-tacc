@@ -16,9 +16,7 @@ class CategoryButton extends Component {
   }
 
 
-  sendInfo() {
-    console.log('info');
-  }
+  
 
   getUrl(id){
     return `https://firebasestorage.googleapis.com/v0/b/prceliaco-1cfac.appspot.com/o/categories%2F${id}.jpg?alt=media&token=a8e793a7-556d-4ac0-9c88-af8ffa389010`;
@@ -26,10 +24,10 @@ class CategoryButton extends Component {
 
 
   render() {
-    const {title, url} = this.props;
+    const {title, url, type, idx} = this.props;
     return (
       <View style={{ padding: 10 }}>
-        <TouchableOpacity onPress={() => this.sendInfo()}>
+        <TouchableOpacity onPress={() => this.props.getSubcategory(idx, type)}>
           <ImageBackground
             source={{uri: this.getUrl(url)}}
             imageStyle={{ borderRadius: 15 }}

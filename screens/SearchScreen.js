@@ -57,6 +57,8 @@ class SearchScreen extends Component {
       .child('products');
 
     this.addFilterOption = this.addFilterOption.bind(this);
+    this.getDish = this.getDish.bind(this);
+    this.getProd = this.getProd.bind(this);
   }
 
   viewClearButton(text) {
@@ -132,50 +134,36 @@ class SearchScreen extends Component {
     const searchTxt = this.state.searchText;
     const type = this.state.typeProduct;
     const filterOption = this.state.filterOption;
+    // console.log('user celiac status: ', this.state.celiac_status);
+    // console.log('search text: ', this.state.searchText );
+    // console.log('tipo de producto: ', this.state.typeProduct);
+    // console.log('filter option: ', this.state.filterOption);
     let products = [];
     await this.productsRef.once('value', snap => {
-      if (type == '') {
-        snap.forEach(child => {
-          products.push({
-            id: child.val().id,
-            name: child.val().name,
-            brand: child.val().brand,
-            quantity: child.val().quantity,
-            origin: child.val().origin,
-            marsh3Allowed: child.val().marsh3Allowed,
-            _key: child.key
-          });
-          if (
-            userCeliacStatus &&
-            child.val().marsh3Allowed != userCeliacStatus
-          ) {
-            products.splice(products.indexOf(child), 1);
-          }
+      snap.forEach(child => {
+        products.push({
+          id: child.val().id,
+          name: child.val().name,
+          brand: child.val().brand,
+          quantity: child.val().quantity,
+          origin: child.val().origin,
+          category: child.val().category,
+          marsh3Allowed: child.val().marsh3Allowed,
+          type: child.val().type,
+          _key: child.key
         });
-      } else {
-        snap.forEach(child => {
-          products.push({
-            id: child.val().id,
-            name: child.val().name,
-            brand: child.val().brand,
-            quantity: child.val().quantity,
-            marsh3Allowed: child.val().marsh3Allowed,
-            _key: child.key
-          });
-          if (
-            (userCeliacStatus &&
-              child.val().marsh3Allowed != userCeliacStatus) ||
-            (type != child.val().type && child.val().category != filterOption)
-          ) {
-            products.splice(products.indexOf(child), 1);
-          }
-        });
-      }
-      //? OPTIMIZAR ESTO PLS
-      products = products.filter(product =>
-        product.name.toLowerCase().includes(searchTxt.toLowerCase())
-      );
-      // console.log('productos buscados: ',products);
+      });
+
+      // console.log('antes de los filtros: ', products);
+      
+      if(userCeliacStatus) products = products.filter(product => product.marsh3Allowed === userCeliacStatus);
+      // console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>despues del celiac status: ', products);
+      if(type != '') products = products.filter(product => product.type === type);
+      // console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>despues del type: ', products);
+      if(filterOption != -1) products = products.filter(product => product.category === filterOption);
+      // console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>despues de la categoria: ', products);
+      products = products.filter(product => product.name.toLowerCase().includes(searchTxt.toLowerCase()));
+      // console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>Array Final: ', products);
       this.props.navigation.navigate('ProductsScreen', { products });
     });
   } //! END SEARCH PRODUCT METHOD
@@ -219,12 +207,48 @@ class SearchScreen extends Component {
     });
   }
 
+  getDish(index){
+    this.searchProductBySubcategory(index, 'meal');
+  }
+
+  getProd(index){
+    this.searchProductBySubcategory(index, 'prod');
+  }
+
+  async searchProductBySubcategory(subcategory, type) {
+    const userCeliacStatus = this.state.celiac_status;
+
+    let products = [];
+    await this.productsRef.once('value', snap => {
+      snap.forEach(child => {
+        products.push({
+          id: child.val().id,
+          name: child.val().name,
+          brand: child.val().brand,
+          quantity: child.val().quantity,
+          origin: child.val().origin,
+          subcategory: child.val().subcategory,
+          marsh3Allowed: child.val().marsh3Allowed,
+          type: child.val().type,
+          _key: child.key
+        });
+      });
+      
+      if(userCeliacStatus) products = products.filter(product => product.marsh3Allowed === userCeliacStatus);
+      products = products.filter(product => product.type === type);
+      products = products.filter(product => product.subcategory === subcategory);
+      this.props.navigation.navigate('ProductsScreen', { products });
+    });
+  } //! END SEARCH PRODUCT METHOD
+
+
+
   render() {
     const productos = PRODUCTS.map((item, index) => (
-      <CategoryButton key={index} title={item.title} url={item.id} />
+      <CategoryButton key={index} getSubcategory={this.getProd.bind(this)} title={item.title} url={item.id} idx={index}/>
     ));
     const platos = DISHES.map((item, index) => (
-      <CategoryButton key={index} title={item.title} url={item.id} />
+      <CategoryButton key={index} getSubcategory={this.getDish.bind(this)} title={item.title} url={item.id} idx={index}/>
     ));
     return (
       <SafeAreaView style={styles.container}>
@@ -352,11 +376,15 @@ const styles = StyleSheet.create({
   imageOption: {
     width: '100%',
     height: '100%',
-    justifyContent: 'center'
+    justifyContent: 'flex-end'
   },
   textOption: {
     textAlign: 'center',
-    fontSize: 24
+    fontSize: 24,
+    borderBottomRightRadius: 20,
+    borderBottomLeftRadius: 20,
+    backgroundColor: 'rgba(255, 255, 255, 0.8)'
+
     // color: Colors.white,
     // fontWeight: "bold"
   },
