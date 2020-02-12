@@ -40,6 +40,20 @@ class LoginScreen extends Component {
                     locale: result.additionalUserInfo.profile.locale,
                     first_name: result.additionalUserInfo.profile.given_name,
                     last_name: result.additionalUserInfo.profile.family_name,
+                    preferences: {
+                      dishes: {
+                        dish01: true,
+                        dish02: true,
+                        dish03: true,
+                        dish04: true
+                      },
+                      products: {
+                        product01: true,
+                        product02: true,
+                        product03: true,
+                        product04: true
+                      }
+                    },
                     celiac_status: false //MARSH 3 CELIAC LEVEL FALSE FOR DEFAULT
                   });
               } else {

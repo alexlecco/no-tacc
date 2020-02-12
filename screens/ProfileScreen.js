@@ -25,7 +25,7 @@ class ProfileScreen extends Component {
       user: {
         first_name: '',
         last_name: '',
-        celiac_status: false
+        celiac_status: false,
       },
       selected: 'key0',
       isUser: false
@@ -50,6 +50,7 @@ class ProfileScreen extends Component {
             prod01: snap.val().preferences.products.prod01,
             prod02: snap.val().preferences.products.prod02,
             prod03: snap.val().preferences.products.prod03
+
           },
           dishes: {
             dish01: snap.val().preferences.dishes.dish01,
@@ -67,6 +68,7 @@ class ProfileScreen extends Component {
   }
 
   setUserData() {}
+
 
   componentDidMount() {
     // setTimeout(()=>this.getUserData(), 2000);
@@ -99,7 +101,7 @@ class ProfileScreen extends Component {
         products: {
           prod01: this.state.preferences.products.prod01,
           prod02: this.state.preferences.products.prod02,
-          prod03: this.state.preferences.products.prod03
+          prod03: this.state.preferences.products.prod03,
         },
         dishes: {
           dish01: this.state.preferences.dishes.dish01,
@@ -113,107 +115,19 @@ class ProfileScreen extends Component {
     });
   }
 
-  _handleToggleProd01() {
-    this.setState({
-      preferences: {
-        products: {
-          prod01: !this.state.preferences.products.prod01,
-          prod02: this.state.preferences.products.prod02,
-          prod03: this.state.preferences.products.prod03
-        },
-        dishes: {
-          dish01: this.state.preferences.dishes.dish01,
-          dish02: this.state.preferences.dishes.dish02,
-          dish03: this.state.preferences.dishes.dish03
-        }
-      }
-    });
-  }
 
-  _handleToggleProd02() {
-    this.setState({
-      preferences: {
-        products: {
-          prod01: this.state.preferences.products.prod01,
-          prod02: !this.state.preferences.products.prod02,
-          prod03: this.state.preferences.products.prod03
-        },
-        dishes: {
-          dish01: this.state.preferences.dishes.dish01,
-          dish02: this.state.preferences.dishes.dish02,
-          dish03: this.state.preferences.dishes.dish03
-        }
-      }
-    });
-  }
+  _handleToggleProd01() { this.setState({preferences: { products: { prod01: !this.state.preferences.products.prod01, prod02: this.state.preferences.products.prod02, prod03: this.state.preferences.products.prod03}, dishes: { dish01: this.state.preferences.dishes.dish01, dish02: this.state.preferences.dishes.dish02, dish03: this.state.preferences.dishes.dish03}}})}
 
-  _handleToggleProd03() {
-    this.setState({
-      preferences: {
-        products: {
-          prod01: this.state.preferences.products.prod01,
-          prod02: this.state.preferences.products.prod02,
-          prod03: !this.state.preferences.products.prod03
-        },
-        dishes: {
-          dish01: this.state.preferences.dishes.dish01,
-          dish02: this.state.preferences.dishes.dish02,
-          dish03: this.state.preferences.dishes.dish03
-        }
-      }
-    });
-  }
+  _handleToggleProd02() { this.setState({preferences: { products: { prod01: this.state.preferences.products.prod01, prod02: !this.state.preferences.products.prod02, prod03: this.state.preferences.products.prod03}, dishes: { dish01: this.state.preferences.dishes.dish01, dish02: this.state.preferences.dishes.dish02, dish03: this.state.preferences.dishes.dish03}}})}
+  
+  _handleToggleProd03() { this.setState({preferences: { products: { prod01: this.state.preferences.products.prod01, prod02: this.state.preferences.products.prod02, prod03: !this.state.preferences.products.prod03}, dishes: { dish01: this.state.preferences.dishes.dish01, dish02: this.state.preferences.dishes.dish02, dish03: this.state.preferences.dishes.dish03}}})}
 
-  _handleToggleDish01() {
-    this.setState({
-      preferences: {
-        products: {
-          prod01: this.state.preferences.products.prod01,
-          prod02: this.state.preferences.products.prod02,
-          prod03: this.state.preferences.products.prod03
-        },
-        dishes: {
-          dish01: !this.state.preferences.dishes.dish01,
-          dish02: this.state.preferences.dishes.dish02,
-          dish03: this.state.preferences.dishes.dish03
-        }
-      }
-    });
-  }
+  _handleToggleDish01() { this.setState({preferences: { products: { prod01: this.state.preferences.products.prod01, prod02: this.state.preferences.products.prod02, prod03: this.state.preferences.products.prod03}, dishes: { dish01: !this.state.preferences.dishes.dish01, dish02: this.state.preferences.dishes.dish02, dish03: this.state.preferences.dishes.dish03}}})}
 
-  _handleToggleDish02() {
-    this.setState({
-      preferences: {
-        products: {
-          prod01: this.state.preferences.products.prod01,
-          prod02: this.state.preferences.products.prod02,
-          prod03: this.state.preferences.products.prod03
-        },
-        dishes: {
-          dish01: this.state.preferences.dishes.dish01,
-          dish02: !this.state.preferences.dishes.dish02,
-          dish03: this.state.preferences.dishes.dish03
-        }
-      }
-    });
-  }
+  _handleToggleDish02() { this.setState({preferences: { products: { prod01: this.state.preferences.products.prod01, prod02: this.state.preferences.products.prod02, prod03: this.state.preferences.products.prod03}, dishes: { dish01: this.state.preferences.dishes.dish01, dish02: !this.state.preferences.dishes.dish02, dish03: this.state.preferences.dishes.dish03}}})}
+  
+  _handleToggleDish03() { this.setState({preferences: { products: { prod01: this.state.preferences.products.prod01, prod02: this.state.preferences.products.prod02, prod03: this.state.preferences.products.prod03}, dishes: { dish01: this.state.preferences.dishes.dish01, dish02: this.state.preferences.dishes.dish02, dish03: !this.state.preferences.dishes.dish03}}})}
 
-  _handleToggleDish03() {
-    this.setState({
-      preferences: {
-        products: {
-          prod01: this.state.preferences.products.prod01,
-          prod02: this.state.preferences.products.prod02,
-          prod03: this.state.preferences.products.prod03
-        },
-        dishes: {
-          dish01: this.state.preferences.dishes.dish01,
-          dish02: this.state.preferences.dishes.dish02,
-          dish03: !this.state.preferences.dishes.dish03
-        }
-      }
-    });
-  }
   logout() {
     firebase.auth().signOut();
     this.props.navigation.navigate('LoadingScreen');
@@ -337,6 +251,7 @@ class ProfileScreen extends Component {
               </View>
               </View>
             </ScrollView>
+
           </React.Fragment>
         ) : (
           <ActivityIndicator style={styles.load} size='large' />
@@ -428,6 +343,20 @@ const styles = StyleSheet.create({
   panelsContainer: {
     flex: 1,
     flexDirection: 'row'
+  },
+  panel: {
+    justifyContent: 'center',
+  },
+  pickerContainer: {
+    height: 50,
+    backgroundColor: 'powderblue',
+    width: '100%',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  panelsContainer: {
+    flex: 1,
+    flexDirection: 'row',
   },
   panel: {
     justifyContent: 'center',
