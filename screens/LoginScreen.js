@@ -48,10 +48,10 @@ class LoginScreen extends Component {
                         dish04: true
                       },
                       products: {
-                        product01: true,
-                        product02: true,
-                        product03: true,
-                        product04: true
+                        prod01: true,
+                        prod02: true,
+                        prod03: true,
+                        prod04: true
                       }
                     },
                     celiac_status: false //MARSH 3 CELIAC LEVEL FALSE FOR DEFAULT
