@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "no-tacc",
+    "name": "PR Celiaco",
     "slug": "no-tacc",
     "privacy": "public",
     "sdkVersion": "35.0.0",
@@ -9,13 +9,13 @@
       "android",
       "web"
     ],
-    "version": "1.0.2",
+    "version": "1.0.3",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "splash": {
       "image": "./assets/splash.png",
       "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
+      "backgroundColor": "#4db6ac"
     },
     "updates": {
       "fallbackToCacheTimeout": 0

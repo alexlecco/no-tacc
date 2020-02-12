@@ -29,4 +29,8 @@ export default colors = {
   secondaryDarkColor: '#007ac1',
   primaryTextColor: '#000000',
   secondaryTextColor: '#000000',
+
+  
+  primaryOpacityColor: '#909482',
+
 };

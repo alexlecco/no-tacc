@@ -1,5 +1,15 @@
-import React, { Component } from "react";
-import { View, Text, StyleSheet, Button, Image, Dimensions, FlatList, Platform } from "react-native";
+import React, { Component } from 'react';
+import {
+  View,
+  Text,
+  StyleSheet,
+  Button,
+  Image,
+  Dimensions,
+  FlatList,
+  Platform,
+  ActivityIndicator
+} from 'react-native';
 
 import Constants from 'expo-constants';
 import * as Location from 'expo-location';
@@ -7,7 +17,7 @@ import * as Permissions from 'expo-permissions';
 import { getDistance } from 'geolib';
 
 import StoreCard from './StoreCard';
-import { firebaseApp } from "../config/firebase";
+import { firebaseApp } from '../config/firebase';
 
 export default class ProductByStores extends Component {
   constructor(props) {
@@ -20,18 +30,21 @@ export default class ProductByStores extends Component {
       orderedStores: []
     };
 
-    this.productByStoresRef = firebaseApp.database().ref().child("products-stores");
+    this.productByStoresRef = firebaseApp
+      .database()
+      .ref()
+      .child('products-stores');
   }
 
   componentWillMount() {
-    this.verifyDevice();  
+    this.verifyDevice();
     this.listenForproductByStores(this.productByStoresRef);
   }
-  
+
   verifyDevice() {
     if (Platform.OS === 'android' && !Constants.isDevice) {
       this.setState({
-        errorMessage: 'Esta funcionalidad no está disponible',
+        errorMessage: 'Esta funcionalidad no está disponible'
       });
     } else {
       this._getLocationAsync();
@@ -42,7 +55,7 @@ export default class ProductByStores extends Component {
     let { status } = await Permissions.askAsync(Permissions.LOCATION);
     if (status !== 'granted') {
       this.setState({
-        errorMessage: 'Permiso denegado para acceder a la geolocalización',
+        errorMessage: 'Permiso denegado para acceder a la geolocalización'
       });
     }
 
@@ -55,10 +68,10 @@ export default class ProductByStores extends Component {
         latitude: location.coords.latitude,
         longitude: location.coords.longitude
       }
-    }
+    };
 
-    const updatedList = stores.map((point) => {
-      return({
+    const updatedList = stores.map(point => {
+      return {
         id: point.id,
         address: point.address,
         name: point.name,
@@ -68,18 +81,18 @@ export default class ProductByStores extends Component {
           longitude: point.location.longitude
         },
         _key: point.name
-      })
+      };
     });
-    
-    updatedList.sort((a, b) => (a.distance > b.distance) ? 1 : -1)
-        
+
+    updatedList.sort((a, b) => (a.distance > b.distance ? 1 : -1));
+
     this.setState({ orderedStores: updatedList });
   };
 
   listenForproductByStores(productByStoresRef) {
     const productID = this.props.product.id;
 
-    productByStoresRef.on("value", snap => {
+    productByStoresRef.on('value', snap => {
       let productByStores = [];
       snap.forEach(child => {
         if (child.val().product === productID) {
@@ -92,7 +105,7 @@ export default class ProductByStores extends Component {
           });
         }
       });
-      
+
       this.setState({
         productByStores: productByStores,
         loading: false
@@ -102,19 +115,19 @@ export default class ProductByStores extends Component {
 
   reorderProducts() {
     let { orderedStores, productByStores } = this.state;
-    let reorderedProducts = []
+    let reorderedProducts = [];
 
     orderedStores.forEach(store => {
       let found = false;
-      
+
       productByStores.filter(product => {
-        if(!found && product.store == store.id) {
-          reorderedProducts.push(product)
-          found = true
+        if (!found && product.store == store.id) {
+          reorderedProducts.push(product);
+          found = true;
         } else {
-          found = false
+          found = false;
         }
-      })
+      });
     });
 
     return reorderedProducts;
@@ -132,74 +145,74 @@ export default class ProductByStores extends Component {
       text = JSON.stringify(this.state.location);
     }
 
-    return text === 'Calculando distancia' ? text : ''
+    return text === 'Calculando distancia' ? text : '';
   }
 
   render() {
     const { product } = this.props;
     const { orderedStores } = this.state;
     const reorderedProducts = this.reorderProducts();
-    const distanceText = this.setDistanceText(); 
+    const distanceText = this.setDistanceText();
 
-    return (
-      this.state.loading ?
-        <View style={styles.loading}><Text style={styles.title}> Cargando </Text></View>
-      :
-        <View style={styles.container}>
-          <View>
-            <Image
-              source={{ uri: this.getProductPhoto(product.id) }}
-              style={styles.coverImage}
-            />
-            <Text style={styles.title}> {product.name} </Text>
-            <Text>{distanceText}</Text>
-            <FlatList
-                style={styles.flatList}
-                data={reorderedProducts}
-                renderItem={productByStores =>
-                              <StoreCard
-                                productByStores={productByStores}
-                                product={product}
-                                orderedStores={orderedStores}
-                              />
-                            }
-                keyExtractor={(product, index) => { return product.id.toString() }}
-            />
-          {/* <Button
-            title="volver"
-            onPress={() => this.props.showOrHideProductByStores(product)}
-          /> */}
-          </View>
+    return this.state.loading ? (
+      <View style={styles.loading}>
+        <Text style={styles.title}> Cargando </Text>
+        <ActivityIndicator />
+      </View>
+    ) : (
+      <View style={styles.container}>
+        <View>
+          <Image
+            source={{ uri: this.getProductPhoto(product.id) }}
+            style={styles.coverImage}
+          />
+          <Text style={styles.title}> {product.name} </Text>
+            <Text style={styles.title}>{distanceText}</Text>
+          <FlatList
+            style={styles.flatList}
+            data={reorderedProducts}
+            renderItem={productByStores => (
+              <StoreCard
+                productByStores={productByStores}
+                product={product}
+                orderedStores={orderedStores}
+              />
+            )}
+            keyExtractor={(product, index) => {
+              return product.id.toString();
+            }}
+          />
         </View>
+      </View>
     );
   }
 }
 
 const styles = StyleSheet.create({
-    container: {
-      flex: 1,
-      flexDirection: 'column',
-      justifyContent: 'space-between',
-    },
-    title: {
-        color: colors.white,
-        textAlign: "center",
-        paddingTop: 20,
-        paddingBottom: 5,
-    },
-    loading: {
-      flex: 1,
-      alignItems: 'center',
-      justifyContent: 'center',
-    },
-    photo: {
-        width: 50,
-        height: "auto",
-        flex: 0.3,
-        backgroundColor: "powderblue",
-    },
-    coverImage: {
-        width: Dimensions.get('window').width,
-        height: Dimensions.get('window').height / 4,
-    }
+  container: {
+    flex: 1,
+    flexDirection: 'column',
+    justifyContent: 'space-between'
+  },
+  title: {
+    color: colors.white,
+    textAlign: 'center',
+    paddingTop: 20,
+    paddingBottom: 5
+  },
+  loading: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center'
+  },
+  photo: {
+    width: 50,
+    height: 'auto',
+    flex: 0.3,
+    backgroundColor: 'powderblue'
+  },
+  coverImage: {
+    width: Dimensions.get('window').width,
+    height: Dimensions.get('window').height / 4
+  }
 });
