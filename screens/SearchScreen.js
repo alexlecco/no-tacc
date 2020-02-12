@@ -9,12 +9,16 @@ import {
   Image,
   TextInput,
   ImageBackground,
-  KeyboardAvoidingView
+  KeyboardAvoidingView,
+  ScrollView,
+  Dimensions
 } from 'react-native';
 import { Icon } from 'native-base';
 import Colors from '../constants/Colors';
 import { firebaseApp } from '../config/firebase';
 import FilterProduct from '../components/FilterProduct';
+import CategoryButton from '../components/CategoryButton';
+import { DISHES, PRODUCTS } from '../constants/Category';
 
 const platos = ['Desayuno', 'Almuerzo', 'Merienda', 'Cena'];
 const productos = [
@@ -24,6 +28,8 @@ const productos = [
   'Cereales',
   'Harinas'
 ];
+const screenWidth = Math.round(Dimensions.get('window').width);
+const screenHeight = Math.round(Dimensions.get('window').height);
 
 class SearchScreen extends Component {
   constructor(props) {
@@ -31,6 +37,10 @@ class SearchScreen extends Component {
     this.state = {
       searchText: '',
       celiac_status: {},
+      userPreferences: {
+        dishes: [],
+        products: []
+      },
       textInputStatus: 'untouched',
       food: false,
       typeProduct: '',
@@ -39,7 +49,10 @@ class SearchScreen extends Component {
       filtersActive: false,
       pressStatus: 0,
       list: [],
-      filterOption: -1
+      filterOption: -1,
+
+      gustos:[],
+      preferencias:[]
     };
     this.userRef = firebaseApp
       .database()
@@ -51,6 +64,8 @@ class SearchScreen extends Component {
       .child('products');
 
     this.addFilterOption = this.addFilterOption.bind(this);
+    this.getDish = this.getDish.bind(this);
+    this.getProd = this.getProd.bind(this);
   }
 
   viewClearButton(text) {
@@ -103,18 +118,20 @@ class SearchScreen extends Component {
     await this.userRef.once('value', snap => {
       snap.forEach(child => {
         if (child.key === uid)
-          this.state.celiac_status = child.val().celiac_status;
+          this.setState({
+            celiac_status: child.val().celiac_status,
+            userPreferences: {
+              dishes: child.val().preferences.dishes,
+              products: child.val().preferences.products
+            }
+          });
       });
     });
-    // console.log('usuario stado:', this.state.celiac_status);
+    this.makeArrays();
+    // console.log('preferences:', this.state.userPreferences);
   }
 
   componentDidMount() {
-    this.getUserData();
-  }
-
-  //! Revisar
-  componentDidUpdate(){
     this.getUserData();
   }
 
@@ -126,54 +143,48 @@ class SearchScreen extends Component {
     const searchTxt = this.state.searchText;
     const type = this.state.typeProduct;
     const filterOption = this.state.filterOption;
+    // console.log('user celiac status: ', this.state.celiac_status);
+    // console.log('search text: ', this.state.searchText );
+    // console.log('tipo de producto: ', this.state.typeProduct);
+    // console.log('filter option: ', this.state.filterOption);
     let products = [];
     await this.productsRef.once('value', snap => {
-      if (type == '') {
-        snap.forEach(child => {
-          products.push({
-            id: child.val().id,
-            name: child.val().name,
-            brand: child.val().brand,
-            quantity: child.val().quantity,
-            origin: child.val().origin,
-            marsh3Allowed: child.val().marsh3Allowed,
-            _key: child.key
-          });
-          if (
-            userCeliacStatus &&
-            child.val().marsh3Allowed != userCeliacStatus
-          ) {
-            products.splice(products.indexOf(child), 1);
-          }
+      snap.forEach(child => {
+        products.push({
+          id: child.val().id,
+          name: child.val().name,
+          brand: child.val().brand,
+          quantity: child.val().quantity,
+          origin: child.val().origin,
+          category: child.val().category,
+          marsh3Allowed: child.val().marsh3Allowed,
+          type: child.val().type,
+          _key: child.key
         });
-      } else {
-        snap.forEach(child => {
-          products.push({
-            id: child.val().id,
-            name: child.val().name,
-            brand: child.val().brand,
-            quantity: child.val().quantity,
-            marsh3Allowed: child.val().marsh3Allowed,
-            _key: child.key
-          });
-          if (
-            (userCeliacStatus &&
-              child.val().marsh3Allowed != userCeliacStatus) ||
-            (type != child.val().type && child.val().category != filterOption)
-          ) {
-            products.splice(products.indexOf(child), 1);
-          }
-        });
-      }
-      //? OPTIMIZAR ESTO PLS
+      });
+
+      // console.log('antes de los filtros: ', products);
+
+      if (userCeliacStatus)
+        products = products.filter(
+          product => product.marsh3Allowed === userCeliacStatus
+        );
+      // console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>despues del celiac status: ', products);
+      if (type != '')
+        products = products.filter(product => product.type === type);
+      // console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>despues del type: ', products);
+      if (filterOption != -1)
+        products = products.filter(
+          product => product.category === filterOption
+        );
+      // console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>despues de la categoria: ', products);
       products = products.filter(product =>
         product.name.toLowerCase().includes(searchTxt.toLowerCase())
       );
-      // console.log('productos buscados: ',products);
+      // console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>Array Final: ', products);
       this.props.navigation.navigate('ProductsScreen', { products });
     });
   } //! END SEARCH PRODUCT METHOD
-
 
   goToProfile() {
     const { navigation } = this.props;
@@ -214,70 +225,171 @@ class SearchScreen extends Component {
     });
   }
 
+  getDish(index) {
+    this.searchProductBySubcategory(index, 'meal');
+  }
+
+  getProd(index) {
+    this.searchProductBySubcategory(index, 'prod');
+  }
+
+  async searchProductBySubcategory(subcategory, type) {
+    const userCeliacStatus = this.state.celiac_status;
+
+    let products = [];
+    await this.productsRef.once('value', snap => {
+      snap.forEach(child => {
+        products.push({
+          id: child.val().id,
+          name: child.val().name,
+          brand: child.val().brand,
+          quantity: child.val().quantity,
+          origin: child.val().origin,
+          subcategory: child.val().subcategory,
+          marsh3Allowed: child.val().marsh3Allowed,
+          type: child.val().type,
+          _key: child.key
+        });
+      });
+
+      if (userCeliacStatus)
+        products = products.filter(
+          product => product.marsh3Allowed === userCeliacStatus
+        );
+      products = products.filter(product => product.type === type);
+      products = products.filter(
+        product => product.subcategory === subcategory
+      );
+      this.props.navigation.navigate('ProductsScreen', { products });
+    });
+  } //! END SEARCH PRODUCT METHOD
+
+  makeArrays() {
+    const dishes = Object.values(this.state.userPreferences.dishes);
+    const products = Object.values(this.state.userPreferences.products);
+
+    let platos = [];
+    let productos = [];
+    dishes.forEach((dish, index) => {
+      if (dish) platos.push(index);
+    });
+    products.forEach((product, index) => {
+      if (product) productos.push(index);
+    });
+
+    platos = DISHES.filter((item, index) => platos.includes(index));
+    productos = PRODUCTS.filter((item, index) => productos.includes(index));
+
+    this.setState({
+      gustos: platos,
+      preferencias: productos,
+    });
+  }
+
   render() {
+    const {gustos, preferencias} = this.state;
+    const productos = preferencias.map((item, index) => (
+      <CategoryButton
+        key={index}
+        getSubcategory={this.getProd.bind(this)}
+        title={item.title}
+        url={item.id}
+        idx={index}
+      />
+    ));
+    const platos = gustos.map((item, index) => (
+      <CategoryButton
+        key={index}
+        getSubcategory={this.getDish.bind(this)}
+        title={item.title}
+        url={item.id}
+        idx={index}
+      />
+    ));
     return (
       <SafeAreaView style={styles.container}>
-        <View style={styles.sectionTop}>
-          <TouchableOpacity
-            style={styles.userButton}
-            onPress={() => this.goToProfile()}
-          >
-            <Icon name="person" />
-          </TouchableOpacity>
-        </View>
-        <View style={styles.searchOptions}>
-          <Text style={styles.title}>
-            Ingrese el tipo de producto que desea
-          </Text>
-          <View style={styles.options}>
-            <TouchableHighlight
-              onPress={() => this.pressed('prod', 1)}
-              style={
-                this.state.pressStatus === 1
-                  ? styles.optionPressed
-                  : styles.option
-              }
+        <ScrollView>
+          <View style={styles.sectionTop}>
+            <TouchableOpacity
+              style={styles.userButton}
+              onPress={() => this.goToProfile()}
             >
-              <ImageBackground
-                source={require('../assets/img/productos.jpg')}
-                imageStyle={{ borderRadius: 20 }}
-                style={styles.imageOption}
-              >
-                <Text style={styles.textOption}>Productos</Text>
-              </ImageBackground>
-            </TouchableHighlight>
-            <TouchableHighlight
-              onPress={() => this.pressed('meal', 2)}
-              style={
-                this.state.pressStatus === 2
-                  ? styles.optionPressed
-                  : styles.option
-              }
-            >
-              <ImageBackground
-                source={require('../assets/img/platos.jpg')}
-                imageStyle={{ borderRadius: 20 }}
-                style={styles.imageOption}
-              >
-                <Text style={styles.textOption}>Platos</Text>
-              </ImageBackground>
-            </TouchableHighlight>
+              <Icon name="person" />
+            </TouchableOpacity>
           </View>
-          {this.state.filtersActive ? (
-            <React.Fragment>
-              <FilterProduct
-                list={this.state.list}
-                addFilterOption={this.addFilterOption.bind(this)}
-              />
-            </React.Fragment>
-          ) : (
-            <View></View>
-          )}
-        </View>
-        <View style={styles.searchBar}>
-          <Text>Ingrese el nombre del producto</Text>
-          {this.renderSearchBar()}
-        </View>
+          <View style={styles.searchOptions}>
+            <Text style={styles.title}>
+              Ingrese el tipo de producto que desea
+            </Text>
+            <View style={styles.options}>
+              <TouchableHighlight
+                onPress={() => this.pressed('prod', 1)}
+                style={
+                  this.state.pressStatus === 1
+                    ? styles.optionPressed
+                    : styles.option
+                }
+              >
+                <ImageBackground
+                  source={require('../assets/img/productos.jpg')}
+                  imageStyle={{ borderRadius: 20 }}
+                  style={styles.imageOption}
+                >
+                  <Text style={styles.textOption}>Productos</Text>
+                </ImageBackground>
+              </TouchableHighlight>
+              <TouchableHighlight
+                onPress={() => this.pressed('meal', 2)}
+                style={
+                  this.state.pressStatus === 2
+                    ? styles.optionPressed
+                    : styles.option
+                }
+              >
+                <ImageBackground
+                  source={require('../assets/img/platos.jpg')}
+                  imageStyle={{ borderRadius: 20 }}
+                  style={styles.imageOption}
+                >
+                  <Text style={styles.textOption}>Platos</Text>
+                </ImageBackground>
+              </TouchableHighlight>
+            </View>
+            {this.state.filtersActive ? (
+              <React.Fragment>
+                <FilterProduct
+                  list={this.state.list}
+                  addFilterOption={this.addFilterOption.bind(this)}
+                />
+              </React.Fragment>
+            ) : (
+              <View></View>
+            )}
+          </View>
+          <View style={styles.searchBar}>
+            <Text>Ingrese el nombre del producto</Text>
+            {this.renderSearchBar()}
+          </View>
+
+          <View style={styles.recomendations}>
+            <Text style={{ paddingLeft: 10 }}>Platos recomendados</Text>
+            <ScrollView
+              horizontal={true}
+              showsHorizontalScrollIndicator={false}
+            >
+              {platos}
+            </ScrollView>
+          </View>
+          <View style={styles.recomendations}>
+            <Text style={{ paddingLeft: 10 }}>Productos recomendados</Text>
+            <ScrollView
+              horizontal={true}
+              showsHorizontalScrollIndicator={false}
+            >
+              {productos}
+            </ScrollView>
+          </View>
+        </ScrollView>
       </SafeAreaView>
     );
   }
@@ -307,24 +419,28 @@ const styles = StyleSheet.create({
     paddingVertical: 5
   },
   option: {
-    height: 150,
-    width: '45%',
+    height: screenHeight * 0.2,
+    width: screenWidth * 0.4,
     borderRadius: 20
   },
   optionPressed: {
-    height: 150,
-    width: '45%',
+    height: screenHeight * 0.2,
+    width: screenWidth * 0.4,
     borderRadius: 20,
     opacity: 0.65
   },
   imageOption: {
     width: '100%',
     height: '100%',
-    justifyContent: 'center'
+    justifyContent: 'flex-end'
   },
   textOption: {
     textAlign: 'center',
-    fontSize: 24
+    fontSize: 24,
+    borderBottomRightRadius: 20,
+    borderBottomLeftRadius: 20,
+    backgroundColor: 'rgba(255, 255, 255, 0.8)'
+
     // color: Colors.white,
     // fontWeight: "bold"
   },
