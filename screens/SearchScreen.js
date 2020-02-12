@@ -135,6 +135,7 @@ class SearchScreen extends Component {
     this.getUserData();
   }
 
+
   async searchProduct() {
     if (this.state.searchText == '') {
       return;
