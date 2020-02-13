@@ -6,7 +6,7 @@ import ProductByStores from '../components/ProductByStores';
 
 import { firebaseApp } from "../config/firebase";
 
-class ProductsScreen extends Component {
+export default class ProductsScreen extends Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -95,7 +95,6 @@ class ProductsScreen extends Component {
     );
   }
 }
-export default ProductsScreen;
 
 const styles = StyleSheet.create({
   container: {
