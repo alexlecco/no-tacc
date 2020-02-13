@@ -12,10 +12,10 @@ import {
 } from 'react-native';
 
 import { firebaseApp } from '../config/firebase';
-import colors from '../constants/Colors';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 
 import firebase from 'firebase';
+import { DISHES, PRODUCTS } from '../constants/Category';
 import Colors from '../constants/Colors';
 
 class ProfileScreen extends Component {
@@ -25,8 +25,10 @@ class ProfileScreen extends Component {
       user: {
         first_name: '',
         last_name: '',
-        celiac_status: false,
+        celiac_status: false
       },
+      products: [],
+      dishes: [],
       selected: 'key0',
       isUser: false
     };
@@ -45,19 +47,8 @@ class ProfileScreen extends Component {
           last_name: snap.val().last_name,
           profile_picture: snap.val().profile_picture
         },
-        preferences: {
-          products: {
-            prod01: snap.val().preferences.products.prod01,
-            prod02: snap.val().preferences.products.prod02,
-            prod03: snap.val().preferences.products.prod03
-
-          },
-          dishes: {
-            dish01: snap.val().preferences.dishes.dish01,
-            dish02: snap.val().preferences.dishes.dish02,
-            dish03: snap.val().preferences.dishes.dish03
-          }
-        },
+        products: Object.values(snap.val().preferences.products),
+        dishes: Object.values(snap.val().preferences.dishes),
         isUser: true
       });
 
@@ -67,11 +58,7 @@ class ProfileScreen extends Component {
     });
   }
 
-  setUserData() {}
-
-
   componentDidMount() {
-    // setTimeout(()=>this.getUserData(), 2000);
     this.getUserData();
   }
 
@@ -98,42 +85,63 @@ class ProfileScreen extends Component {
     this.userRef.update({
       celiac_status: this.state.user.celiac_status,
       preferences: {
-        products: {
-          prod01: this.state.preferences.products.prod01,
-          prod02: this.state.preferences.products.prod02,
-          prod03: this.state.preferences.products.prod03,
-        },
-        dishes: {
-          dish01: this.state.preferences.dishes.dish01,
-          dish02: this.state.preferences.dishes.dish02,
-          dish03: this.state.preferences.dishes.dish03
-        }
+        products: this.state.products,
+        dishes: this.state.dishes
       }
     });
-    this.props.navigation.navigate('SearchScreen', {
+    
+    this.props.navigation.push('PRCeliaco', {
       uid: this.state.user.uid
     });
   }
 
+  toggleProduct(index, e) {
+    const products = [...this.state.products];
 
-  _handleToggleProd01() { this.setState({preferences: { products: { prod01: !this.state.preferences.products.prod01, prod02: this.state.preferences.products.prod02, prod03: this.state.preferences.products.prod03}, dishes: { dish01: this.state.preferences.dishes.dish01, dish02: this.state.preferences.dishes.dish02, dish03: this.state.preferences.dishes.dish03}}})}
+    products[index].toggled = !products[index].toggled;
+    this.setState({ products });
+  }
 
-  _handleToggleProd02() { this.setState({preferences: { products: { prod01: this.state.preferences.products.prod01, prod02: !this.state.preferences.products.prod02, prod03: this.state.preferences.products.prod03}, dishes: { dish01: this.state.preferences.dishes.dish01, dish02: this.state.preferences.dishes.dish02, dish03: this.state.preferences.dishes.dish03}}})}
-  
-  _handleToggleProd03() { this.setState({preferences: { products: { prod01: this.state.preferences.products.prod01, prod02: this.state.preferences.products.prod02, prod03: !this.state.preferences.products.prod03}, dishes: { dish01: this.state.preferences.dishes.dish01, dish02: this.state.preferences.dishes.dish02, dish03: this.state.preferences.dishes.dish03}}})}
+  toggleDish(index, e) {
+    const dishes = [...this.state.dishes];
 
-  _handleToggleDish01() { this.setState({preferences: { products: { prod01: this.state.preferences.products.prod01, prod02: this.state.preferences.products.prod02, prod03: this.state.preferences.products.prod03}, dishes: { dish01: !this.state.preferences.dishes.dish01, dish02: this.state.preferences.dishes.dish02, dish03: this.state.preferences.dishes.dish03}}})}
-
-  _handleToggleDish02() { this.setState({preferences: { products: { prod01: this.state.preferences.products.prod01, prod02: this.state.preferences.products.prod02, prod03: this.state.preferences.products.prod03}, dishes: { dish01: this.state.preferences.dishes.dish01, dish02: !this.state.preferences.dishes.dish02, dish03: this.state.preferences.dishes.dish03}}})}
-  
-  _handleToggleDish03() { this.setState({preferences: { products: { prod01: this.state.preferences.products.prod01, prod02: this.state.preferences.products.prod02, prod03: this.state.preferences.products.prod03}, dishes: { dish01: this.state.preferences.dishes.dish01, dish02: this.state.preferences.dishes.dish02, dish03: !this.state.preferences.dishes.dish03}}})}
+    dishes[index].toggled = !dishes[index].toggled;
+    this.setState({ dishes });
+  }
 
   logout() {
     firebase.auth().signOut();
     this.props.navigation.navigate('LoadingScreen');
   }
 
+  renderSwitchDish(option, index) {
+    return (
+      <View key={index} style={styles.switch}>
+        <Switch
+          onValueChange={() => this.toggleDish(index)}
+          value={option.toggled}
+        />
+        <Text>{option.title}</Text>
+      </View>
+    );
+  }
+  renderSwitchProduct(option, index) {
+    return (
+      <View key={index} style={styles.switch}>
+        <Switch
+          onValueChange={() => this.toggleProduct(index)}
+          value={option.toggled}
+        />
+        <Text>{option.title}</Text>
+      </View>
+    );
+  }
+
   render() {
+    productos = this.state.products.map((item, i) =>
+      this.renderSwitchProduct(item, i)
+    );
+    platos = this.state.dishes.map((item, i) => this.renderSwitchDish(item, i));
     return (
       <SafeAreaView style={{ flex: 1 }}>
         {this.state.isUser ? (
@@ -172,86 +180,35 @@ class ProfileScreen extends Component {
                   <Text style={styles.info}>Gustos y preferencias: </Text>
                   <View style={styles.panelsContainer}>
                     <View style={styles.panel}>
-                      <Text>Bebidas con alcohol</Text>
-                      <Switch
-                        onValueChange={() => this._handleToggleProd01()}
-                        value={this.state.preferences.products.prod01}
-                        trackColor={{
-                          true: colors.secondaryDarkColor,
-                          false: 'grey'
-                        }}
-                      />
-
-                      <Text>Panificados dulces</Text>
-                      <Switch
-                        onValueChange={() => this._handleToggleProd02()}
-                        value={this.state.preferences.products.prod02}
-                        trackColor={{
-                          true: colors.secondaryDarkColor,
-                          false: 'grey'
-                        }}
-                      />
-
-                      <Text>Chocolates sin azucar</Text>
-                      <Switch
-                        onValueChange={() => this._handleToggleProd03()}
-                        value={this.state.preferences.products.prod03}
-                        trackColor={{
-                          true: colors.secondaryDarkColor,
-                          false: 'grey'
-                        }}
-                      />
+                      {/* PANEL DISHES */}
+                      {platos}
                     </View>
                     <View style={styles.panel}>
-                      <Text>Pizzas</Text>
-                      <Switch
-                        onValueChange={() => this._handleToggleDish01()}
-                        value={this.state.preferences.dishes.dish01}
-                        trackColor={{
-                          true: colors.secondaryLightColor,
-                          false: 'grey'
-                        }}
-                      />
-
-                      <Text>Pescado</Text>
-                      <Switch
-                        onValueChange={() => this._handleToggleDish02()}
-                        value={this.state.preferences.dishes.dish02}
-                        trackColor={{
-                          true: colors.secondaryLightColor,
-                          false: 'grey'
-                        }}
-                      />
-
-                      <Text>Carnes</Text>
-                      <Switch
-                        onValueChange={() => this._handleToggleDish03()}
-                        value={this.state.preferences.dishes.dish03}
-                        trackColor={{
-                          true: colors.secondaryLightColor,
-                          false: 'grey'
-                        }}
-                      />
+                      {/* PANEL PRODUCTS */}
+                      {productos}
                     </View>
                   </View>
                 </View>
               </View>
-              <View style={{flexDirection: 'row', justifyContent: 'space-around', padding: 20,}}>
-              <View style={styles.button}>
-                <TouchableOpacity
-                  onPress={() => this.next()}
-                >
-                  <Text>Guardar</Text>
-                </TouchableOpacity>
-              </View>
-              <View style={styles.logout}>
-                <TouchableOpacity onPress={() => this.logout()}>
-                  <Text style={{ textAlign: 'center' }}>Cerrar Sesión</Text>
-                </TouchableOpacity>
-              </View>
+              <View
+                style={{
+                  flexDirection: 'row',
+                  justifyContent: 'space-around',
+                  padding: 20
+                }}
+              >
+                <View style={styles.button}>
+                  <TouchableOpacity onPress={() => this.next()}>
+                    <Text>Guardar</Text>
+                  </TouchableOpacity>
+                </View>
+                <View style={styles.logout}>
+                  <TouchableOpacity onPress={() => this.logout()}>
+                    <Text style={{ textAlign: 'center' }}>Cerrar Sesión</Text>
+                  </TouchableOpacity>
+                </View>
               </View>
             </ScrollView>
-
           </React.Fragment>
         ) : (
           <ActivityIndicator style={styles.load} size='large' />
@@ -265,7 +222,7 @@ export default ProfileScreen;
 const styles = StyleSheet.create({
   header: {
     backgroundColor: colors.primaryDarkColor,
-    height: 200
+    height: 100
   },
   load: {
     paddingTop: 320
@@ -279,7 +236,7 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     alignSelf: 'center',
     position: 'absolute',
-    marginTop: 130,
+    marginTop: 30,
     backgroundColor: 'white'
   },
   body: {
@@ -299,7 +256,8 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: colors.primaryTextColor,
     marginHorizontal: 10,
-    marginTop: 20
+    marginTop: 20,
+    paddingBottom: 10,
   },
   description: {
     fontSize: 16,
@@ -308,7 +266,7 @@ const styles = StyleSheet.create({
     textAlign: 'center'
   },
   picker: {
-    width: '80%',
+    width: '100%',
     color: colors.primaryTextColor,
     fontSize: 16
     // backgroundColor: colors.secondaryColor,
@@ -334,35 +292,23 @@ const styles = StyleSheet.create({
     // justifyContent: 'center'
   },
   pickerContainer: {
+    borderRadius: 5,
     height: 50,
     backgroundColor: 'powderblue',
-    width: '100%',
-    justifyContent: 'center',
-    alignItems: 'center'
+    width: '100%'
   },
   panelsContainer: {
     flex: 1,
     flexDirection: 'row'
   },
   panel: {
-    justifyContent: 'center',
-  },
-  pickerContainer: {
-    height: 50,
-    backgroundColor: 'powderblue',
-    width: '100%',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  panelsContainer: {
-    flex: 1,
-    flexDirection: 'row',
-  },
-  panel: {
+    borderRadius: 5,
     justifyContent: 'center',
     alignItems: 'center',
     width: '50%',
-    height: 200,
     backgroundColor: 'powderblue'
-  }
+  },
+  switch:{
+    padding: 5,
+  },
 });
