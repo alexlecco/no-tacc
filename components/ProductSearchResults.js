@@ -52,7 +52,7 @@ export default class ProductSearchResults extends Component {
   setFoundProductsText() {
     const number = this.state.products.length;
     const text = this.state.products.length === 1 ? 'producto encontrado' : 'productos encontrados';
-    
+
     return `${number} ${text}`
   }
 
@@ -60,10 +60,14 @@ export default class ProductSearchResults extends Component {
     const { showOrHideProductByStores } = this.props;
     const foundProductsText = this.setFoundProductsText();
 
-    return this.state.products.length === 0 ? (
+    return !this.state.products ? (
       <View style={styles.loading}>
         <Text style={styles.title}> Cargando </Text>
         <Spinner></Spinner>
+      </View>
+    ) : this.state.products.length === 0 ? (
+      <View style={styles.loading}>
+        <Text style={styles.title}> No se encontraron productos </Text>
       </View>
     ) : (
       <React.Fragment>
