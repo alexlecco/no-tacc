@@ -58,6 +58,7 @@ export default class StoreCard extends Component {
     const { orderedStores } = this.props;
     const productByStores = this.props.store ? [] : this.props.productByStores.item;
     const store = this.props.store ? this.props.store : orderedStores.find(store => store.id === productByStores.store)
+    console.log("store:::::::::::::", store)
     
     return (
       this.props.store ?
@@ -71,6 +72,9 @@ export default class StoreCard extends Component {
           </Text>
           <Text style={styles.address}>
             Dirección: {store.item.address}
+          </Text>
+          <Text style={styles.address}>
+            Apertura: {store.item.openedTime}
           </Text>
         </View>
       </View>

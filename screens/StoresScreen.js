@@ -1,46 +1,66 @@
 import React, { Component } from 'react';
 import {
-  Picker,
   StyleSheet,
-  Text,
   View,
-  Image,
   SafeAreaView,
-  ActivityIndicator,
-  Switch,
   FlatList,
-  ScrollView
+  ScrollView,
+  Platform,
+  Text
 } from 'react-native';
 
 import { firebaseApp } from '../config/firebase';
 import colors from '../constants/Colors';
-import { TouchableOpacity } from 'react-native-gesture-handler';
 import StoreCard from '../components/StoreCard';
+
+import Constants from 'expo-constants';
+import * as Permissions from 'expo-permissions';
+import * as Location from 'expo-location';
+import { getDistance } from 'geolib';
 
 export default class StoresScreen extends Component {
   constructor(props) {
     super(props);
     this.state = {
-        stores: [],
+      stores: [],
       user: {
         first_name: '',
         last_name: '',
         celiac_status: false,
       },
       selected: 'key0',
-      isUser: false
+      isUser: false,
+      location: null,
+      orderedStores: []
     };
 
     this.storesRef = firebaseApp.database().ref().child("stores");
   }
 
   componentWillMount() {
-    this.listenForStores(this.storesRef);
+    this.verifyDevice(this.storesRef);
   }
 
-  listenForStores(storesRef) {
+  verifyDevice(storesRef) {
+    if (Platform.OS === 'android' && !Constants.isDevice) {
+      this.setState({
+        errorMessage: 'Esta funcionalidad no está disponible'
+      });
+    } else {
+      this._getLocationAsync(storesRef);
+    }
+  }
+
+  _getLocationAsync = async (storesRef) => {
+    let { status } = await Permissions.askAsync(Permissions.LOCATION);
+    if (status !== 'granted') {
+      this.setState({
+        errorMessage: 'Permiso denegado para acceder a la geolocalización'
+      });
+    }
+
+    let stores = [];
     storesRef.on("value", snap => {
-      let stores = [];
       snap.forEach(child => {
         stores.push({
           id: child.val().id,
@@ -55,22 +75,65 @@ export default class StoresScreen extends Component {
           _key: child.key
         });
       });
-
-      this.setState({ stores: stores });
     });
+
+    let location = await Location.getCurrentPositionAsync({});
+    this.setState({ location: location });
+
+    const localPoint = {
+      location: {
+        latitude: location.coords.latitude,
+        longitude: location.coords.longitude
+      }
+    };
+
+    const updatedList = stores.map(point => {
+      return {
+        id: point.id,
+        address: point.address,
+        name: point.name,
+        distance: getDistance(localPoint.location, point.location),
+        location: {
+          latitude: point.location.latitude,
+          longitude: point.location.longitude
+        },
+        openedTime: point.openedTime,
+        _key: point.name
+      };
+    });
+
+    updatedList.sort((a, b) => (a.distance > b.distance ? 1 : -1));
+
+    this.setState({ orderedStores: updatedList });
+  };
+
+  setDistanceText() {
+    let text = 'Calculando distancia';
+
+    if (this.state.errorMessage) {
+      text = this.state.errorMessage;
+    } else if (this.state.location) {
+      text = JSON.stringify(this.state.location);
     }
 
+    return text === 'Calculando distancia' ? text : '';
+  }
+
   render() {
-    const { stores } = this.state;
+    const { orderedStores } = this.state;
+    const distanceText      = this.setDistanceText();
+
+    console.log("orderedStores:::::::::::::::::", orderedStores)
 
     return (
       <SafeAreaView style={{ flex: 1 }}>
           <React.Fragment>
             <ScrollView>
               <View style={styles.body}>
+                <Text style={styles.title}>{distanceText}</Text>
                 <FlatList
                     style={styles.flatList}
-                    data={stores}
+                    data={orderedStores}
                     renderItem={store => (
                         <StoreCard
                             store={store}
@@ -190,5 +253,11 @@ const styles = StyleSheet.create({
     width: '50%',
     height: 200,
     backgroundColor: 'powderblue'
+  },
+  title: {
+    color: colors.white,
+    textAlign: 'center',
+    paddingTop: 20,
+    paddingBottom: 5
   }
 });
