@@ -80,6 +80,7 @@ export default class ProductByStores extends Component {
           latitude: point.location.latitude,
           longitude: point.location.longitude
         },
+        openedTime: point.openedTime,
         _key: point.name
       };
     });
@@ -139,6 +140,7 @@ export default class ProductByStores extends Component {
 
   setDistanceText() {
     let text = 'Calculando distancia';
+
     if (this.state.errorMessage) {
       text = this.state.errorMessage;
     } else if (this.state.location) {
@@ -149,10 +151,10 @@ export default class ProductByStores extends Component {
   }
 
   render() {
-    const { product } = this.props;
+    const { product       } = this.props;
     const { orderedStores } = this.state;
     const reorderedProducts = this.reorderProducts();
-    const distanceText = this.setDistanceText();
+    const distanceText      = this.setDistanceText();
 
     return this.state.loading ? (
       <View style={styles.loading}>
@@ -167,7 +169,7 @@ export default class ProductByStores extends Component {
             style={styles.coverImage}
           />
           <Text style={styles.title}> {product.name} </Text>
-            <Text style={styles.title}>{distanceText}</Text>
+          <Text style={styles.title}> {distanceText} </Text>
           <FlatList
             style={styles.flatList}
             data={reorderedProducts}

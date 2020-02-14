@@ -51,6 +51,7 @@ export default class StoresScreen extends Component {
             latitude: child.val().location.latitude,
             longitude: child.val().location.longitude
           },
+          openedTime: child.val().openedTime,
           _key: child.key
         });
       });
@@ -61,7 +62,6 @@ export default class StoresScreen extends Component {
 
   render() {
     const { stores } = this.state;
-    console.log("stores:::::::::::", stores)
 
     return (
       <SafeAreaView style={{ flex: 1 }}>

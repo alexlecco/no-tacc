@@ -18,7 +18,6 @@ export default class StoreCard extends Component {
   }
 
   componentWillMount() {
-    console.log("this.props.store:::::::::::", this.props.store)
     if(!this.props.store) {this.listenForStores(this.storesRef);} 
   }
 
@@ -37,6 +36,7 @@ export default class StoreCard extends Component {
             latitude: child.val().location.latitude,
             longitude: child.val().location.longitude
           },
+          openedTime: child.val().openedTime,
           _key: child.key
         });
       });
@@ -51,16 +51,13 @@ export default class StoreCard extends Component {
   }
 
   getStorePhoto(store) {
-    const borrar = `https://firebasestorage.googleapis.com/v0/b/prceliaco-1cfac.appspot.com/o/stores%2F${store}.png?alt=media`;
-    console.log("borrar::::::::::::::::::", borrar)
-    return borrar;
+    return `https://firebasestorage.googleapis.com/v0/b/prceliaco-1cfac.appspot.com/o/stores%2F${store}.png?alt=media`;;
   }
 
   render() {
     const { orderedStores } = this.props;
     const productByStores = this.props.store ? [] : this.props.productByStores.item;
     const store = this.props.store ? this.props.store : orderedStores.find(store => store.id === productByStores.store)
-    console.log("store en StoreCard::::::::::::", store);
     
     return (
       this.props.store ?
@@ -92,6 +89,9 @@ export default class StoreCard extends Component {
           </Text>
           <Text style={styles.address}>
             Precio en este local: ${ productByStores.price }
+          </Text>
+          <Text style={styles.address}>
+            Apertura: {store.openedTime}
           </Text>
         </View>
       </View>

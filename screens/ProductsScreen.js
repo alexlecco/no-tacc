@@ -37,6 +37,7 @@ export default class ProductsScreen extends Component {
             latitude: child.val().location.latitude,
             longitude: child.val().location.longitude
           },
+          openedTime: child.val().openedTime,
           _key: child.key
         });
       });
