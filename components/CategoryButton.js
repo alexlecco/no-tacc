@@ -27,7 +27,7 @@ class CategoryButton extends Component {
     const {title, url, type, idx} = this.props;
     return (
       <View style={{ padding: 10 }}>
-        <TouchableOpacity onPress={() => this.props.getSubcategory(idx, type)}>
+        <TouchableOpacity onPress={() => this.props.getSubcategory(title, type)}>
           <ImageBackground
             source={{uri: this.getUrl(url)}}
             imageStyle={{ borderRadius: 15 }}
