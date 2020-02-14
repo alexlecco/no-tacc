@@ -11,7 +11,8 @@ import {
   ImageBackground,
   KeyboardAvoidingView,
   ScrollView,
-  Dimensions
+  Dimensions,
+  ActivityIndicator
 } from 'react-native';
 import { Icon } from 'native-base';
 import Colors from '../constants/Colors';
@@ -50,7 +51,7 @@ class SearchScreen extends Component {
       pressStatus: 0,
       list: [],
       filterOption: -1,
-
+      userData: false,
       gustos:[],
       preferencias:[]
     };
@@ -123,7 +124,8 @@ class SearchScreen extends Component {
             userPreferences: {
               dishes: child.val().preferences.dishes,
               products: child.val().preferences.products
-            }
+            },
+            userData: true,
           });
       });
     });
@@ -278,10 +280,10 @@ class SearchScreen extends Component {
     let platos = [];
     let productos = [];
     dishes.forEach((dish, index) => {
-      if (dish) platos.push(index);
+      if (dish.toggled) platos.push(index);
     });
     products.forEach((product, index) => {
-      if (product) productos.push(index);
+      if (product.toggled) productos.push(index);
     });
 
     platos = DISHES.filter((item, index) => platos.includes(index));
@@ -385,21 +387,29 @@ class SearchScreen extends Component {
 
           <View style={styles.recomendations}>
             <Text style={{ paddingLeft: 10 }}>Platos recomendados</Text>
-            <ScrollView
-              horizontal={true}
-              showsHorizontalScrollIndicator={false}
-            >
-              {platos}
-            </ScrollView>
+            {this.state.userData ? (
+              <React.Fragment>
+                <ScrollView
+                  horizontal={true}
+                  showsHorizontalScrollIndicator={false}
+                >
+                  {platos}
+                </ScrollView>
+              </React.Fragment>
+            ) :  (<ActivityIndicator  style={styles.load} size='large' />)}
           </View>
           <View style={styles.recomendations}>
             <Text style={{ paddingLeft: 10 }}>Productos recomendados</Text>
-            <ScrollView
-              horizontal={true}
-              showsHorizontalScrollIndicator={false}
-            >
-              {productos}
-            </ScrollView>
+            {this.state.userData ? (
+              <React.Fragment>
+                <ScrollView
+                  horizontal={true}
+                  showsHorizontalScrollIndicator={false}
+                >
+                  {productos}
+                </ScrollView>
+              </React.Fragment>
+            ) :  (<ActivityIndicator  style={styles.load} size='large' />)}
           </View>
         </ScrollView>
       </SafeAreaView>
@@ -508,5 +518,8 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     // justifyContent: 'center',
     alignItems: 'center'
-  }
+  },
+  load: {
+    height: screenHeight * .2
+  },
 });
