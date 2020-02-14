@@ -234,12 +234,12 @@ class SearchScreen extends Component {
     });
   }
 
-  getDish(index) {
-    this.searchProductBySubcategory(index, 'meal');
+  getDish(id) {
+    this.searchProductBySubcategory(id, 'meal');
   }
 
-  getProd(index) {
-    this.searchProductBySubcategory(index, 'prod');
+  getProd(id) {
+    this.searchProductBySubcategory(id, 'prod');
   }
 
   async searchProductBySubcategory(subcategory, type) {
