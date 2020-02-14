@@ -119,7 +119,8 @@ const styles = StyleSheet.create({
     justifyContent: 'center'
   },
   flatList: {
-    flex: 0.5
+    flex: 0.5,
+    marginBottom: 10
   },
   top: {
     flexDirection: 'row',

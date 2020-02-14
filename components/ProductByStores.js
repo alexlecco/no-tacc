@@ -216,5 +216,8 @@ const styles = StyleSheet.create({
   coverImage: {
     width: Dimensions.get('window').width,
     height: Dimensions.get('window').height / 4
+  },
+  flatList: {
+    marginBottom: 10
   }
 });
