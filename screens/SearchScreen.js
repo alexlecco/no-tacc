@@ -234,12 +234,12 @@ class SearchScreen extends Component {
     });
   }
 
-  getDish(word) {
-    this.searchProductBySubcategory(word, 'meal');
+  getDish(id) {
+    this.searchProductBySubcategory(id, 'meal');
   }
 
-  getProd(word) {
-    this.searchProductBySubcategory(word, 'prod');
+  getProd(id) {
+    this.searchProductBySubcategory(id, 'prod');
   }
 
   async searchProductBySubcategory(subcategory, type) {
@@ -267,7 +267,7 @@ class SearchScreen extends Component {
         );
       products = products.filter(product => product.type === type);
       products = products.filter(
-        product => product.subcategory.toLowerCase() === subcategory.toLowerCase()
+        product => product.subcategory === subcategory
       );
       this.props.navigation.navigate('ProductsScreen', { products });
     });
