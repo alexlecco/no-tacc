@@ -23,6 +23,7 @@ import LoadingScreen from './screens/LoadingScreen';
 import LoginScreen from './screens/LoginScreen';
 import ProductsScreen from './screens/ProductsScreen';
 import ProfileScreen from './screens/ProfileScreen';
+import StoresScreen from './screens/StoresScreen';
 import SearchScreen from './screens/SearchScreen';
 import Colors from './constants/Colors';
 
@@ -55,6 +56,12 @@ const AppStackNavigator = createStackNavigator({
     screen: ProfileScreen,
     navigationOptions: {
       headerTitle: 'Perfil de Usuario'
+    }
+  },
+  StoresScreen: {
+    screen: StoresScreen,
+    navigationOptions: {
+      headerTitle: 'Locales sin TACC'
     }
   },
   // SearchScreen: SearchScreen

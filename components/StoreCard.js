@@ -18,7 +18,8 @@ export default class StoreCard extends Component {
   }
 
   componentWillMount() {
-    this.listenForStores(this.storesRef);
+    console.log("this.props.store:::::::::::", this.props.store)
+    if(!this.props.store) {this.listenForStores(this.storesRef);} 
   }
 
   listenForStores(storesRef) {
@@ -50,15 +51,35 @@ export default class StoreCard extends Component {
   }
 
   getStorePhoto(store) {
-    return `https://firebasestorage.googleapis.com/v0/b/prceliaco-1cfac.appspot.com/o/stores%2F${store}.png?alt=media`;
+    const borrar = `https://firebasestorage.googleapis.com/v0/b/prceliaco-1cfac.appspot.com/o/stores%2F${store}.png?alt=media`;
+    console.log("borrar::::::::::::::::::", borrar)
+    return borrar;
   }
 
   render() {
     const { orderedStores } = this.props;
-    const productByStores = this.props.productByStores.item;
-    const store = orderedStores.find(store => store.id === productByStores.store)
+    const productByStores = this.props.store ? [] : this.props.productByStores.item;
+    const store = this.props.store ? this.props.store : orderedStores.find(store => store.id === productByStores.store)
+    console.log("store en StoreCard::::::::::::", store);
     
     return (
+      this.props.store ?
+      
+      <View style={styles.card}>
+        <Image style={styles.photo} source={{uri: this.getStorePhoto(store.item.id)}} />
+        <View style={styles.store}>
+          <Text style={styles.name}> {store.item.name} </Text>
+          <Text style={styles.address}>
+            Distancia: {store.item.distance} m
+          </Text>
+          <Text style={styles.address}>
+            Dirección: {store.item.address}
+          </Text>
+        </View>
+      </View>
+
+      :
+
       <View style={styles.card}>
         <Image style={styles.photo} source={{uri: this.getStorePhoto(productByStores.store)}} />
         <View style={styles.store}>

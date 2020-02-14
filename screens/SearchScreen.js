@@ -193,6 +193,12 @@ class SearchScreen extends Component {
     this.props.navigation.navigate('ProfileScreen', { uid });
   }
 
+  goToStores() {
+    const { navigation } = this.props;
+    const uid = navigation.getParam('uid');
+    this.props.navigation.navigate('StoresScreen', { uid });
+  }
+
   depressed() {
     this.setState({
       pressStatus: 0,
@@ -317,6 +323,11 @@ class SearchScreen extends Component {
             >
               <Icon name="person" />
             </TouchableOpacity>
+            <Text
+              style={styles.storesButton}
+              onPress={() => this.goToStores()} >
+              Conocé los locales sin TACC
+            </Text>
           </View>
           <View style={styles.searchOptions}>
             <Text style={styles.title}>
@@ -467,11 +478,13 @@ const styles = StyleSheet.create({
     marginLeft: 5
   },
   sectionTop: {
+    flex: 1,
     //? CONTENEDOR DEL BOTON PARA DATOS DE USUARIO
     // backgroundColor: Colors.secondaryColor,
     padding: 5,
     marginTop: 10,
-    flexDirection: 'row-reverse'
+    flexDirection: 'row-reverse',
+    justifyContent: 'space-between'
   },
   userButton: {
     borderColor: Colors.primaryColor,
@@ -482,6 +495,14 @@ const styles = StyleSheet.create({
     height: 40,
     alignItems: 'center',
     justifyContent: 'center'
+  },
+  storesButton: {
+    width: 'auto',
+    height: 40,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingLeft: 20,
+    paddingTop: 10,
   },
   bar: {
     flexDirection: 'row',
