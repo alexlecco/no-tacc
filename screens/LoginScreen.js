@@ -3,6 +3,7 @@ import { View, Text, StyleSheet, TouchableOpacity, ActivityIndicator, Image } fr
 import * as Google from 'expo-google-app-auth';
 import { firebaseApp } from '../config/firebase';
 import Colors from '../constants/Colors';
+import { DISHES, PRODUCTS } from '../constants/Category';
 
 class LoginScreen extends Component {
   constructor(props) {
@@ -41,18 +42,8 @@ class LoginScreen extends Component {
                     first_name: result.additionalUserInfo.profile.given_name,
                     last_name: result.additionalUserInfo.profile.family_name,
                     preferences: {
-                      dishes: {
-                        dish01: true,
-                        dish02: true,
-                        dish03: true,
-                        dish04: true
-                      },
-                      products: {
-                        prod01: true,
-                        prod02: true,
-                        prod03: true,
-                        prod04: true
-                      }
+                      dishes: DISHES,
+                      products: PRODUCTS
                     },
                     celiac_status: false //MARSH 3 CELIAC LEVEL FALSE FOR DEFAULT
                   });
