@@ -18,7 +18,7 @@ export default class StoreCard extends Component {
   }
 
   componentWillMount() {
-    this.listenForStores(this.storesRef);
+    if(!this.props.store) {this.listenForStores(this.storesRef);} 
   }
 
   listenForStores(storesRef) {
@@ -36,6 +36,7 @@ export default class StoreCard extends Component {
             latitude: child.val().location.latitude,
             longitude: child.val().location.longitude
           },
+          openedTime: child.val().openedTime,
           _key: child.key
         });
       });
@@ -50,15 +51,36 @@ export default class StoreCard extends Component {
   }
 
   getStorePhoto(store) {
-    return `https://firebasestorage.googleapis.com/v0/b/prceliaco-1cfac.appspot.com/o/stores%2F${store}.png?alt=media`;
+    return `https://firebasestorage.googleapis.com/v0/b/prceliaco-1cfac.appspot.com/o/stores%2F${store}.png?alt=media`;;
   }
 
   render() {
     const { orderedStores } = this.props;
-    const productByStores = this.props.productByStores.item;
-    const store = orderedStores.find(store => store.id === productByStores.store)
+    const productByStores = this.props.store ? [] : this.props.productByStores.item;
+    const store = this.props.store ? this.props.store : orderedStores.find(store => store.id === productByStores.store)
+    console.log("store:::::::::::::", store)
     
     return (
+      this.props.store ?
+      
+      <View style={styles.card}>
+        <Image style={styles.photo} source={{uri: this.getStorePhoto(store.item.id)}} />
+        <View style={styles.store}>
+          <Text style={styles.name}> {store.item.name} </Text>
+          <Text style={styles.address}>
+            Distancia: {store.item.distance} m
+          </Text>
+          <Text style={styles.address}>
+            Dirección: {store.item.address}
+          </Text>
+          <Text style={styles.address}>
+            Apertura: {store.item.openedTime}
+          </Text>
+        </View>
+      </View>
+
+      :
+
       <View style={styles.card}>
         <Image style={styles.photo} source={{uri: this.getStorePhoto(productByStores.store)}} />
         <View style={styles.store}>
@@ -71,6 +93,9 @@ export default class StoreCard extends Component {
           </Text>
           <Text style={styles.address}>
             Precio en este local: ${ productByStores.price }
+          </Text>
+          <Text style={styles.address}>
+            Apertura: {store.openedTime}
           </Text>
         </View>
       </View>

@@ -18,7 +18,7 @@ import firebase from 'firebase';
 import { DISHES, PRODUCTS } from '../constants/Category';
 import Colors from '../constants/Colors';
 
-class ProfileScreen extends Component {
+export default class ProfileScreen extends Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -217,7 +217,6 @@ class ProfileScreen extends Component {
     );
   }
 }
-export default ProfileScreen;
 
 const styles = StyleSheet.create({
   header: {

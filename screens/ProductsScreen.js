@@ -6,7 +6,7 @@ import ProductByStores from '../components/ProductByStores';
 
 import { firebaseApp } from "../config/firebase";
 
-class ProductsScreen extends Component {
+export default class ProductsScreen extends Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -37,6 +37,7 @@ class ProductsScreen extends Component {
             latitude: child.val().location.latitude,
             longitude: child.val().location.longitude
           },
+          openedTime: child.val().openedTime,
           _key: child.key
         });
       });
@@ -95,7 +96,6 @@ class ProductsScreen extends Component {
     );
   }
 }
-export default ProductsScreen;
 
 const styles = StyleSheet.create({
   container: {
