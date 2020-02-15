@@ -68,13 +68,13 @@ export default class StoreCard extends Component {
         <View style={styles.store}>
           <Text style={styles.name}> {store.item.name} </Text>
           <Text style={styles.address}>
-            Distancia: {store.item.distance} m
+            <Text style={styles.boldText}>Distancia:</Text> {store.item.distance} m
           </Text>
           <Text style={styles.address}>
-            Dirección: {store.item.address}
+            <Text style={styles.boldText}>Dirección:</Text> {store.item.address}
           </Text>
           <Text style={styles.address}>
-            Apertura: {store.item.openedTime}
+            <Text style={styles.boldText}>Horario de atencion:</Text> {store.item.openedTime}
           </Text>
         </View>
       </View>
@@ -86,16 +86,16 @@ export default class StoreCard extends Component {
         <View style={styles.store}>
           <Text style={styles.name}> {store.name} </Text>
           <Text style={styles.address}>
-            Distancia: {store.distance} m
+            <Text style={styles.boldText}>Distancia:</Text> {store.distance} m
           </Text>
           <Text style={styles.address}>
-            Dirección: {store.address}
+            <Text style={styles.boldText}>Dirección:</Text> {store.address}
           </Text>
           <Text style={styles.address}>
-            Precio en este local: ${ productByStores.price }
+            <Text style={styles.boldText}>Precio en este local:</Text> ${ productByStores.price }
           </Text>
           <Text style={styles.address}>
-            Apertura: {store.openedTime}
+            <Text style={styles.boldText}>Horario de atencion:</Text> {store.openedTime}
           </Text>
         </View>
       </View>
@@ -125,5 +125,8 @@ const styles = StyleSheet.create({
   name: {
     fontSize: 20,
     textAlign: 'center'
+  },
+  boldText: {
+    fontWeight: 'bold'
   }
 });
